@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate 2D Platformer - 6 Worlds, 60 Levels</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            background: linear-gradient(to bottom, #87ceeb, #e0f6ff);
+            border: 3px solid #333;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* UI Overlays */
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+
+        .ui-overlay.hidden {
+            display: none;
+        }
+
+        .menu-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .menu-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .menu-content h2 {
+            font-size: 36px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .menu-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .menu-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        .menu-button:active {
+            transform: translateY(-1px);
+        }
+
+        .player-info {
+            margin-top: 20px;
+            font-size: 16px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .world-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .world-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .world-card:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.6);
+            transform: scale(1.05);
+        }
+
+        .world-card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .world-card p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .level-button {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .level-button:hover {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            transform: scale(1.05);
+        }
+
+        .level-button.completed {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .shop-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255,255,255,0.3);
+            text-align: center;
+        }
+
+        .shop-item:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.6);
+            transform: scale(1.05);
+        }
+
+        .shop-item-preview {
+            width: 40px;
+            height: 40px;
+            margin: 10px auto;
+            border-radius: 5px;
+        }
+
+        .shop-item-price {
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .shop-item.owned {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4caf50;
+        }
+
+        .hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+
+        .hud.hidden {
+            display: none;
+        }
+
+        .hud-section {
+            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .tutorial-content {
+            text-align: left;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .tutorial-content h3 {
+            color: #ffd700;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .tutorial-content p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .settings-content {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .settings-content label {
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-content input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .settings-content input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .settings-content select {
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255,255,255,0.9);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .level-stats {
+            text-align: left;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .level-stats p {
+            margin: 10px 0;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .achievement-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .achievement-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .achievement-item.unlocked {
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            border-color: #ffed4e;
+        }
+
+        .achievement-item.locked {
+            opacity: 0.5;
+        }
+
+        .account-info {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .account-info div {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .auth-form input {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .auth-form input:focus {
+            outline: 2px solid #ffd700;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        @media (max-width: 768px) {
+            .world-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .level-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .shop-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .achievement-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        canvas {
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <!-- Main Menu -->
+    <div id="mainMenu" class="ui-overlay">
+        <div class="menu-content scrollbar-custom">
+            <h1>🎮 ULTIMATE PLATFORMER</h1>
+            <p style="margin-bottom: 30px; font-size: 16px;">6 Worlds | 60 Levels | Infinite Mode</p>
+            <button class="menu-button" onclick="game.playGame()">▶ PLAY</button>
+            <button class="menu-button" onclick="game.showLevelSelect()">🗺️ LEVEL SELECT</button>
+            <button class="menu-button" onclick="game.showShop()">🛍️ SHOP</button>
+            <button class="menu-button" onclick="game.showAccount()">👤 ACCOUNT</button>
+            <button class="menu-button" onclick="game.showTutorial()">📖 TUTORIAL</button>
+            <button class="menu-button" onclick="game.showSettings()">⚙️ SETTINGS</button>
+            <div class="player-info" style="margin-top: 30px;">
+                <div id="playerDisplay" style="font-size: 18px; margin-bottom: 10px;"></div>
+                <div id="statsDisplay"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Level Select Menu -->
+    <div id="levelSelect" class="ui-overlay hidden">
+        <div class="menu-content scrollbar-custom">
+            <h2>SELECT WORLD</h2>
+            <div class="world-grid" id="worldSelectGrid"></div>
+            <button class="menu-button" onclick="game.goToMenu()">← BACK</button>
+        </div>
+    </div>
+
+    <!-- Level Chooser -->
+    <div id="levelChooser" class="ui-overlay hidden">
+        <div class="menu-content scrollbar-custom">
+            <h2 id="worldTitle">WORLD 1 - LEVELS</h2>
+            <div class="level-grid" id="levelGrid"></div>
+            <button class="menu-button" onclick="game.showLevelSelect()">← BACK</button>
+        </div>
+    </div>
+
+    <!-- Shop Menu -->
+    <div id="shopMenu" class="ui-overlay hidden">
+        <div class="menu-content scrollbar-custom">
+            <h2>🛍️ COSMETIC SHOP</h2>
+            <div style="margin-bottom: 20px; font-size: 18px; font-weight: bold;">
+                💰 Coins: <span id="shopCoins">0</span>
+            </div>
+            <div class="shop-grid" id="shopGrid"></div>
+            <button class="menu-button" onclick="game.goToMenu()">← BACK</button>
+        </div>
+    </div>
+
+    <!-- Account Menu -->
+    <div id="accountMenu" class="ui-overlay hidden">
+        <div class="menu-content scrollbar-custom">
+            <h2>👤 ACCOUNT</h2>
+            <div id="accountContent"></div>
+            <button class="menu-button" onclick="game.goToMenu()">← BACK</button>
+        </div>
+    </div>
+
+    <!-- Pause Menu -->
+    <div id="pauseMenu" class="ui-overlay hidden">
+        <div class="menu-content">
+            <h1>⏸️ PAUSED</h1>
+            <button class="menu-button" onclick="game.resume()">▶ RESUME</button>
+            <button class="menu-button" onclick="game.restartLevel()">🔄 RESTART</button>
+            <button class="menu-button" onclick="game.showAchievements()">🏆 ACHIEVEMENTS</button>
+            <button class="menu-button" onclick="game.goToMenu()">🏠 MENU</button>
+        </div>
+    </div>
+
+    <!-- Tutorial Menu -->
+    <div id="tutorialMenu" class="ui-overlay hidden">
+        <div class="menu-content scrollbar-custom">
+            <h2>📖 TUTORIAL</h2>
+            <div class="tutorial-content">
+                <h3>🎮 MOVEMENT</h3>
+                <p><strong>WASD / Arrow Keys</strong> - Move left/right</p>
+                <p><strong>SPACE</strong> - Jump</p>
+                <p><strong>Double Jump</strong> - Press SPACE twice</p>
+                <p><strong>S / Down Arrow</strong> - Duck</p>
+                
+                <h3>⚡ ADVANCED TECHNIQUES</h3>
+                <p><strong>Double Tap SHIFT</strong> - Dash (move quickly)</p>
+                <p><strong>Hold SHIFT</strong> - Sprint</p>
+                <p><strong>Wall Jump</strong> - Jump while against a wall</p>
+                <p><strong>Rope Swing</strong> - Jump on ropes to traverse</p>
+                
+                <h3>🎮 MECHANICS</h3>
+                <p>🚩 <strong>Checkpoints</strong> - Save your progress</p>
+                <p>🔑 <strong>Keys/Doors</strong> - Collect keys to unlock passages</p>
+                <p>💰 <strong>Coins</strong> - Collect for cosmetics & achievements</p>
+                <p>⚙️ <strong>Buttons</strong> - Press to open doors</p>
+                <p>🌪️ <strong>Teleporters</strong> - Warp between locations</p>
+                
+                <h3>⚠️ HAZARDS</h3>
+                <p>🔪 <strong>Spikes</strong> - Instant death</p>
+                <p>🪚 <strong>Saws</strong> - Moving circular blades</p>
+                <p>⚡ <strong>Lasers</strong> - Deadly beams</p>
+                <p>📦 <strong>Falling Blocks</strong> - Watch out!</p>
+                
+                <h3>🎮 CONTROLS SUMMARY</h3>
+                <p><strong>P or ESC</strong> - Pause</p>
+                <p><strong>R</strong> - Restart level</p>
+                <p><strong>/ (Slash)</strong> - Debug mode</p>
+            </div>
+            <button class="menu-button" onclick="game.goToMenu()">← BACK</button>
+        </div>
+    </div>
+
+    <!-- Settings Menu -->
+    <div id="settingsMenu" class="ui-overlay hidden">
+        <div class="menu-content scrollbar-custom">
+            <h2>⚙️ SETTINGS</h2>
+            <div class="settings-content">
+                <label>
+                    <input type="checkbox" id="soundToggle" checked>
+                    🔊 Sound Effects
+                </label>
+                <label>
+                    <input type="checkbox" id="musicToggle" checked>
+                    🎵 Background Music
+                </label>
+                <label>
+                    📢 Volume:
+                    <input type="range" id="volumeSlider" min="0" max="100" value="70">
+                    <span id="volumePercent">70%</span>
+                </label>
+                <label>
+                    ⚡ Dash Type:
+                    <select id="dashType">
+                        <option value="double-tap">Double Tap SHIFT</option>
+                        <option value="single-tap">Single Tap SHIFT</option>
+                    </select>
+                </label>
+            </div>
+            <button class="menu-button" onclick="game.goToMenu()">← BACK</button>
+        </div>
+    </div>
+
+    <!-- Achievements Menu -->
+    <div id="achievementsMenu" class="ui-overlay hidden">
+        <div class="menu-content scrollbar-custom">
+            <h2>🏆 ACHIEVEMENTS</h2>
+            <div style="margin-bottom: 20px; font-size: 16px;">
+                <div id="achievementStats"></div>
+            </div>
+            <div class="achievement-list scrollbar-custom" id="achievementsList"></div>
+            <button class="menu-button" onclick="game.closeAchievements()">← BACK</button>
+        </div>
+    </div>
+
+    <!-- Level Complete Menu -->
+    <div id="levelComplete" class="ui-overlay hidden">
+        <div class="menu-content">
+            <h1>🎉 LEVEL COMPLETE!</h1>
+            <div class="level-stats">
+                <p>⏱️ Time: <span id="finalTime">0:00</span></p>
+                <p>💀 Deaths: <span id="finalDeaths">0</span></p>
+                <p>💰 Coins: <span id="finalCoins">0</span> / <span id="totalCoins">0</span></p>
+                <p>🏆 Achievements: <span id="newAchievements">0</span></p>
+            </div>
+            <button class="menu-button" onclick="game.nextLevel()">→ NEXT LEVEL</button>
+            <button class="menu-button" onclick="game.goToMenu()">🏠 MENU</button>
+        </div>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud" class="hud hidden">
+        <div class="hud-section">
+            <div>Level: <span id="hudLevel">1-1</span></div>
+            <div>Deaths: <span id="hudDeaths">0</span></div>
+        </div>
+        <div class="hud-section">
+            <div id="hudTimer">0:00</div>
+        </div>
+        <div class="hud-section">
+            <div>💰 <span id="hudCoins">0</span></div>
+            <div>🚩 <span id="hudCheckpoints">0</span></div>
+        </div>
+    </div>
+
+    <script>
+        // Game Constants
+        const CONST = {
+            CANVAS_WIDTH: 1280,
+            CANVAS_HEIGHT: 720,
+            GRAVITY: 0.6,
+            PLAYER_WIDTH: 24,
+            PLAYER_HEIGHT: 32,
+            BLOCK_SIZE: 40,
+            WORLDS: 6,
+            LEVELS_PER_WORLD: 10,
+            TOTAL_LEVELS: 60,
+            TOTAL_SKINS: 20,
+            TOTAL_ACHIEVEMENTS: 200
+        };
+
+        // Game State
+        let gameState = {
+            currentMenu: 'mainMenu',
+            currentWorld: 0,
+            currentLevel: 0,
+            isPlaying: false,
+            isPaused: false,
+            debug: false,
+            volume: 70,
+            soundOn: true,
+            musicOn: true,
+            dashType: 'double-tap'
+        };
+
+        // Player progress
+        let playerProgress = {
+            username: 'Guest',
+            coins: 0,
+            completedLevels: new Set(),
+            achievements: new Set(),
+            deaths: 0,
+            playtime: 0,
+            skins: new Set([0]),
+            isLoggedIn: false
+        };
+
+        // Account System
+        const accountSystem = {
+            accounts: JSON.parse(localStorage.getItem('accounts') || '{}'),
+            currentUser: localStorage.getItem('currentUser') || null,
+
+            register(username, password) {
+                if (this.accounts[username]) return 'Username already exists';
+                this.accounts[username] = {
+                    password,
+                    coins: 0,
+                    completedLevels: [],
+                    achievements: [],
+                    deaths: 0,
+                    playtime: 0,
+                    skins: [0],
+                    stats: {}
+                };
+                this.save();
+                return 'Account created!';
+            },
+
+            login(username, password) {
+                const account = this.accounts[username];
+                if (!account || account.password !== password) return 'Invalid credentials';
+                this.currentUser = username;
+                localStorage.setItem('currentUser', username);
+                this.loadAccount();
+                return 'Logged in!';
+            },
+
+            logout() {
+                this.currentUser = null;
+                localStorage.removeItem('currentUser');
+            },
+
+            save() {
+                if (this.currentUser && this.accounts[this.currentUser]) {
+                    this.accounts[this.currentUser] = {
+                        password: this.accounts[this.currentUser].password,
+                        coins: playerProgress.coins,
+                        completedLevels: Array.from(playerProgress.completedLevels),
+                        achievements: Array.from(playerProgress.achievements),
+                        deaths: playerProgress.deaths,
+                        playtime: playerProgress.playtime,
+                        skins: Array.from(playerProgress.skins),
+                        stats: playerProgress.stats || {}
+                    };
+                }
+                localStorage.setItem('accounts', JSON.stringify(this.accounts));
+            },
+
+            loadAccount() {
+                if (this.currentUser && this.accounts[this.currentUser]) {
+                    const acc = this.accounts[this.currentUser];
+                    playerProgress.username = this.currentUser;
+                    playerProgress.coins = acc.coins || 0;
+                    playerProgress.completedLevels = new Set(acc.completedLevels || []);
+                    playerProgress.achievements = new Set(acc.achievements || []);
+                    playerProgress.deaths = acc.deaths || 0;
+                    playerProgress.playtime = acc.playtime || 0;
+                    playerProgress.skins = new Set(acc.skins || [0]);
+                    playerProgress.stats = acc.stats || {};
+                    playerProgress.isLoggedIn = true;
+                }
+            }
+        };
+
+        if (accountSystem.currentUser) {
+            accountSystem.loadAccount();
+        }
+
+        // Achievement System
+        const achievements = {
+            list: Array.from({length: 200}, (_, i) => ({
+                id: i,
+                title: `Achievement ${i+1}`,
+                reward: 5 + Math.floor(Math.random() * 45),
+                description: 'Complete a challenge'
+            })),
+
+            unlock(id) {
+                if (!playerProgress.achievements.has(id)) {
+                    playerProgress.achievements.add(id);
+                    const ach = this.list.find(a => a.id === id);
+                    if (ach) {
+                        playerProgress.coins += ach.reward;
+                    }
+                    accountSystem.save();
+                }
+            },
+
+            isUnlocked(id) {
+                return playerProgress.achievements.has(id);
+            }
+        };
+
+        // Shop System
+        const shopSystem = {
+            skins: Array.from({length: CONST.TOTAL_SKINS}, (_, i) => ({
+                id: i,
+                name: `Skin ${i+1}`,
+                price: (i + 1) * 50,
+                color: `hsl(${(i * 18) % 360}, 70%, 50%)`
+            })),
+
+            buySkin(id) {
+                const skin = this.skins[id];
+                if (!skin) return 'Skin not found';
+                if (playerProgress.skins.has(id)) return 'Already owned';
+                if (playerProgress.coins < skin.price) return 'Not enough coins';
+                
+                playerProgress.coins -= skin.price;
+                playerProgress.skins.add(id);
+                accountSystem.save();
+                return 'Skin purchased!';
+            }
+        };
+
+        // Level Generator
+        class LevelGenerator {
+            constructor(world, level) {
+                this.world = world;
+                this.level = level;
+                this.seed = world * 1000 + level;
+            }
+
+            seededRandom() {
+                const x = Math.sin(this.seed++) * 10000;
+                return x - Math.floor(x);
+            }
+
+            generate() {
+                const blocks = [];
+                const hazards = [];
+                const items = [];
+                const checkpoint = [];
+
+                // Generate ground
+                for (let x = 0; x < CONST.CANVAS_WIDTH; x += CONST.BLOCK_SIZE) {
+                    blocks.push({
+                        x, y: CONST.CANVAS_HEIGHT - 80,
+                        width: CONST.BLOCK_SIZE,
+                        height: CONST.BLOCK_SIZE,
+                        type: 'solid'
+                    });
+                }
+
+                const difficulty = 0.3 + (this.level * 0.07);
+
+                if (this.world === 1) {
+                    this.generateWorld1(blocks, hazards, items, checkpoint, difficulty);
+                } else if (this.world === 2) {
+                    this.generateWorld2(blocks, hazards, items, checkpoint, difficulty);
+                } else if (this.world === 3) {
+                    this.generateWorld3(blocks, hazards, items, checkpoint, difficulty);
+                } else if (this.world === 4) {
+                    this.generateWorld4(blocks, hazards, items, checkpoint, difficulty);
+                } else if (this.world === 5) {
+                    this.generateWorld5(blocks, hazards, items, checkpoint, difficulty);
+                } else if (this.world === 6) {
+                    this.generateWorld6(blocks, hazards, items, checkpoint, difficulty);
+                }
+
+                return { blocks, hazards, items, checkpoint, start: { x: 100, y: CONST.CANVAS_HEIGHT - 200 }, end: { x: CONST.CANVAS_WIDTH - 100, y: CONST.CANVAS_HEIGHT - 120 } };
+            }
+
+            generateWorld1(blocks, hazards, items, checkpoint, difficulty) {
+                let x = 200;
+                for (let i = 0; i < 5 + this.level; i++) {
+                    blocks.push({ x, y: CONST.CANVAS_HEIGHT - 200 - (i % 3) * 80, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
+                    x += CONST.BLOCK_SIZE * 4;
+                    items.push({ x: x - CONST.BLOCK_SIZE, y: CONST.CANVAS_HEIGHT - 250 - (i % 3) * 80, type: 'coin' });
+                }
+                checkpoint.push({ x: 600, y: CONST.CANVAS_HEIGHT - 150 });
+            }
+
+            generateWorld2(blocks, hazards, items, checkpoint, difficulty) {
+                let x = 200;
+                for (let i = 0; i < 4 + this.level; i++) {
+                    blocks.push({ x, y: CONST.CANVAS_HEIGHT - 200, width: CONST.BLOCK_SIZE * 3, height: CONST.BLOCK_SIZE, type: 'solid' });
+                    if (i % 2 === 0) {
+                        hazards.push({ x: x + CONST.BLOCK_SIZE, y: CONST.CANVAS_HEIGHT - 250, radius: 20, type: 'saw' });
+                    }
+                    x += CONST.BLOCK_SIZE * 8;
+                }
+                checkpoint.push({ x: 400, y: CONST.CANVAS_HEIGHT - 150 });
+                checkpoint.push({ x: 800, y: CONST.CANVAS_HEIGHT - 150 });
+            }
+
+            generateWorld3(blocks, hazards, items, checkpoint, difficulty) {
+                let x = 200;
+                for (let i = 0; i < 3 + this.level; i++) {
+                    blocks.push({ x, y: CONST.CANVAS_HEIGHT - 200, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
+                    blocks.push({ x: x + CONST.BLOCK_SIZE * 4, y: CONST.CANVAS_HEIGHT - 300, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
+                    hazards.push({ x: x + CONST.BLOCK_SIZE * 3, y: CONST.CANVAS_HEIGHT - 220, width: 40, height: 40, type: 'spike' });
+                    x += CONST.BLOCK_SIZE * 10;
+                }
+                checkpoint.push({ x: 600, y: CONST.CANVAS_HEIGHT - 150 });
+            }
+
+            generateWorld4(blocks, hazards, items, checkpoint, difficulty) {
+                let x = 200;
+                for (let i = 0; i < 3 + this.level; i++) {
+                    blocks.push({ x, y: CONST.CANVAS_HEIGHT - 200, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
+                    blocks.push({ x: x + CONST.BLOCK_SIZE * 7, y: CONST.CANVAS_HEIGHT - 400, width: CONST.BLOCK_SIZE, height: CONST.BLOCK_SIZE, type: 'solid' });
+                    x += CONST.BLOCK_SIZE * 12;
+                }
+            }
+
+            generateWorld5(blocks, hazards, items, checkpoint, difficulty) {
+                let x = 200;
+                for (let i = 0; i < 3 + this.level; i++) {
+                    blocks.push({ x, y: CONST.CANVAS_HEIGHT - 200, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
+                    blocks.push({ x: x + CONST.BLOCK_SIZE * 6, y: CONST.CANVAS_HEIGHT - 300, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
+                    x += CONST.BLOCK_SIZE * 10;
+                }
+            }
+
+            generateWorld6(blocks, hazards, items, checkpoint, difficulty) {
+                let x = 200;
+                for (let i = 0; i < 2 + this.level; i++) {
+                    blocks.push({ x, y: CONST.CANVAS_HEIGHT - 200, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
+                    blocks.push({ x: x + CONST.BLOCK_SIZE * 3, y: 100, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
+                    x += CONST.BLOCK_SIZE * 12;
+                }
+            }
+        }
+
+        // Player class
+        class Player {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = CONST.PLAYER_WIDTH;
+                this.height = CONST.PLAYER_HEIGHT;
+                this.velocityX = 0;
+                this.velocityY = 0;
+                this.isJumping = false;
+                this.isOnGround = false;
+                this.canDoubleJump = true;
+                this.canDash = true;
+                this.dashCooldown = 0;
+                this.lastShiftPress = 0;
+                this.shiftPressCount = 0;
+                this.currentSkin = 0;
+                this.color = 'blue';
+                this.isDucking = false;
+                this.isSprinting = false;
+                this.checkpointX = x;
+                this.checkpointY = y;
+                this.deaths = 0;
+                this.levelStartTime = Date.now();
+            }
+
+            update(keys, blocks, hazards, items) {
+                const speed = this.isSprinting ? 8 : 5;
+                if (keys['a'] || keys['arrowleft']) this.velocityX = -speed;
+                else if (keys['d'] || keys['arrowright']) this.velocityX = speed;
+                else this.velocityX = 0;
+
+                this.isDucking = keys['s'] || keys['arrowdown'];
+                this.isSprinting = keys['shift'];
+
+                const now = Date.now();
+                if (keys['shift']) {
+                    if (now - this.lastShiftPress > 300) {
+                        this.shiftPressCount = 0;
+                    }
+                    this.lastShiftPress = now;
+                    this.shiftPressCount++;
+
+                    if (gameState.dashType === 'double-tap' && this.shiftPressCount === 2) {
+                        if (this.canDash && this.dashCooldown <= 0) {
+                            this.velocityX *= 3;
+                            this.canDash = false;
+                            this.dashCooldown = 30;
+                        }
+                    }
+                } else {
+                    this.shiftPressCount = 0;
+                }
+
+                if ((keys[' '] || keys['w'] || keys['arrowup']) && (this.isOnGround || this.canDoubleJump)) {
+                    if (this.isOnGround) {
+                        this.velocityY = -12;
+                        this.isJumping = true;
+                        this.canDoubleJump = true;
+                    } else if (this.canDoubleJump) {
+                        this.velocityY = -12;
+                        this.canDoubleJump = false;
+                    }
+                    this.isOnGround = false;
+                }
+
+                this.velocityY += CONST.GRAVITY;
+                if (this.velocityY > 15) this.velocityY = 15;
+
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+
+                this.isOnGround = false;
+                for (let block of blocks) {
+                    this.checkCollision(block);
+                }
+
+                for (let hazard of hazards) {
+                    if (this.checkHazardCollision(hazard)) {
+                        this.respawn();
+                        this.deaths++;
+                    }
+                }
+
+                items = items.filter(item => {
+                    if (Math.abs(this.x - item.x) < 30 && Math.abs(this.y - item.y) < 30) {
+                        if (item.type === 'coin') {
+                            playerProgress.coins += 10;
+                        }
+                        return false;
+                    }
+                    return true;
+                });
+
+                if (this.x < 0) this.x = 0;
+                if (this.x + this.width > CONST.CANVAS_WIDTH) this.x = CONST.CANVAS_WIDTH - this.width;
+                if (this.y > CONST.CANVAS_HEIGHT) this.respawn();
+
+                this.dashCooldown--;
+
+                return items;
+            }
+
+            checkCollision(block) {
+                const dx = (this.x + this.width / 2) - (block.x + block.width / 2);
+                const dy = (this.y + this.height / 2) - (block.y + block.height / 2);
+                const distance = Math.max(Math.abs(dx), Math.abs(dy));
+
+                if (distance < this.width / 2 + block.width / 2) {
+                    if (dy > 0) {
+                        this.y = block.y + block.height;
+                        this.velocityY = 0;
+                    } else if (dy < 0) {
+                        this.y = block.y - this.height;
+                        this.velocityY = 0;
+                        this.isOnGround = true;
+                        this.canDoubleJump = true;
+                    }
+
+                    if (dx > 0) {
+                        this.x = block.x + block.width;
+                    } else if (dx < 0) {
+                        this.x = block.x - this.width;
+                    }
+                }
+            }
+
+            checkHazardCollision(hazard) {
+                const dx = (this.x + this.width / 2) - (hazard.x + (hazard.width || 40) / 2);
+                const dy = (this.y + this.height / 2) - (hazard.y + (hazard.height || 40) / 2);
+                const distance = Math.hypot(dx, dy);
+                return distance < this.width / 2 + (hazard.radius || 20);
+            }
+
+            respawn() {
+                this.x = this.checkpointX;
+                this.y = this.checkpointY;
+                this.velocityY = 0;
+            }
+
+            draw(ctx) {
+                const skin = playerProgress.skins.has(this.currentSkin) ? this.currentSkin : 0;
+                const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181', '#AA96DA', '#FCBAD3', '#A8D8EA', '#FFD3B6', '#FFAAA5', '#FF8B94', '#A8E6CF', '#FFD3B6', '#FFAAA5', '#FF8B94', '#C7CEEA', '#FFDDC1', '#B5EAD7', '#FFB4B4', '#FFFFBA'];
+                ctx.fillStyle = colors[skin % colors.length];
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(this.x, this.y, this.width, this.height);
+            }
+        }
+
+        // Game Engine
+        class Game {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.canvas.width = CONST.CANVAS_WIDTH;
+                this.canvas.height = CONST.CANVAS_HEIGHT;
+
+                this.player = null;
+                this.blocks = [];
+                this.hazards = [];
+                this.items = [];
+                this.checkpoint = [];
+                this.levelStart = null;
+                this.levelEnd = null;
+
+                this.keys = {};
+                this.setupInputs();
+                this.animate();
+                this.updateUI();
+            }
+
+            setupInputs() {
+                document.addEventListener('keydown', (e) => {
+                    const key = e.key.toLowerCase();
+                    this.keys[key] = true;
+
+                    if (key === 'p' || key === 'escape') {
+                        if (gameState.isPlaying && !gameState.isPaused) {
+                            this.pause();
+                        } else if (gameState.isPaused) {
+                            this.resume();
+                        }
+                    }
+                    if (key === 'r' && gameState.isPlaying) {
+                        this.restartLevel();
+                    }
+                    if (key === '/' && gameState.isPlaying) {
+                        gameState.debug = !gameState.debug;
+                    }
+                });
+
+                document.addEventListener('keyup', (e) => {
+                    this.keys[e.key.toLowerCase()] = false;
+                });
+            }
+
+            playGame() {
+                gameState.currentWorld = 1;
+                gameState.currentLevel = 1;
+                this.startLevel(gameState.currentWorld, gameState.currentLevel);
+            }
+
+            showLevelSelect() {
+                document.getElementById('mainMenu').classList.add('hidden');
+                document.getElementById('levelSelect').classList.remove('hidden');
+                this.renderWorldSelect();
+            }
+
+            renderWorldSelect() {
+                const grid = document.getElementById('worldSelectGrid');
+                grid.innerHTML = '';
+                for (let w = 1; w <= CONST.WORLDS; w++) {
+                    const btn = document.createElement('div');
+                    btn.className = 'world-card';
+                    btn.innerHTML = `<h3>🌍 WORLD ${w}</h3><p>${['Basics', 'Traps', 'Puzzles', 'Grapple', 'Portals', 'Shadow'][w-1]}</p>`;
+                    btn.onclick = () => this.selectWorld(w);
+                    grid.appendChild(btn);
+                }
+            }
+
+            selectWorld(world) {
+                document.getElementById('levelSelect').classList.add('hidden');
+                document.getElementById('levelChooser').classList.remove('hidden');
+                this.renderLevelSelect(world);
+            }
+
+            renderLevelSelect(world) {
+                document.getElementById('worldTitle').textContent = `WORLD ${world} - LEVELS`;
+                const grid = document.getElementById('levelGrid');
+                grid.innerHTML = '';
+                for (let l = 1; l <= CONST.LEVELS_PER_WORLD; l++) {
+                    const levelId = (world - 1) * 10 + l;
+                    const btn = document.createElement('button');
+                    btn.className = 'level-button';
+                    btn.textContent = l;
+                    const completed = playerProgress.completedLevels.has(levelId);
+                    if (completed) btn.classList.add('completed');
+                    btn.onclick = () => this.startLevel(world, l);
+                    grid.appendChild(btn);
+                }
+            }
+
+            startLevel(world, level) {
+                gameState.currentWorld = world;
+                gameState.currentLevel = level;
+                gameState.isPlaying = true;
+                gameState.isPaused = false;
+                document.getElementById('levelChooser').classList.add('hidden');
+                document.getElementById('mainMenu').classList.add('hidden');
+                document.getElementById('hud').classList.remove('hidden');
+
+                const levelGen = new LevelGenerator(world, level);
+                const levelData = levelGen.generate();
+                this.blocks = levelData.blocks;
+                this.hazards = levelData.hazards;
+                this.items = levelData.items;
+                this.checkpoint = levelData.checkpoint;
+                this.levelStart = levelData.start;
+                this.levelEnd = levelData.end;
+
+                this.player = new Player(this.levelStart.x, this.levelStart.y);
+                if (this.checkpoint.length > 0) {
+                    this.player.checkpointX = this.checkpoint[0].x;
+                    this.player.checkpointY = this.checkpoint[0].y;
+                }
+
+                document.getElementById('hudLevel').textContent = `${world}-${level}`;
+                document.getElementById('hudDeaths').textContent = '0';
+                document.getElementById('hudCoins').textContent = '0';
+                document.getElementById('hudCheckpoints').textContent = this.checkpoint.length;
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+
+                if (!gameState.isPlaying || gameState.isPaused) {
+                    return;
+                }
+
+                if (this.player) {
+                    this.items = this.player.update(this.keys, this.blocks, this.hazards, this.items);
+
+                    for (let cp of this.checkpoint) {
+                        if (Math.abs(this.player.x - cp.x) < 40 && Math.abs(this.player.y - cp.y) < 40) {
+                            this.player.checkpointX = cp.x;
+                            this.player.checkpointY = cp.y;
+                        }
+                    }
+
+                    if (Math.abs(this.player.x - this.levelEnd.x) < 50 && Math.abs(this.player.y - this.levelEnd.y) < 50) {
+                        this.completeLevel();
+                    }
+                }
+
+                this.render();
+                this.updateUI();
+            }
+
+            render() {
+                this.ctx.fillStyle = 'linear-gradient(to bottom, #87ceeb, #e0f6ff)';
+                this.ctx.fillRect(0, 0, CONST.CANVAS_WIDTH, CONST.CANVAS_HEIGHT);
+
+                for (let block of this.blocks) {
+                    this.ctx.fillStyle = '#8B4513';
+                    this.ctx.fillRect(block.x, block.y, block.width, block.height);
+                    this.ctx.strokeStyle = '#654321';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeRect(block.x, block.y, block.width, block.height);
+                }
+
+                for (let hazard of this.hazards) {
+                    if (hazard.type === 'saw') {
+                        this.ctx.fillStyle = '#FF0000';
+                        this.ctx.beginPath();
+                        this.ctx.arc(hazard.x, hazard.y, hazard.radius, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    } else if (hazard.type === 'spike') {
+                        this.ctx.fillStyle = '#FF6B6B';
+                        this.ctx.fillRect(hazard.x, hazard.y, hazard.width, hazard.height);
+                    }
+                }
+
+                for (let item of this.items) {
+                    if (item.type === 'coin') {
+                        this.ctx.fillStyle = '#FFD700';
+                        this.ctx.beginPath();
+                        this.ctx.arc(item.x, item.y, 8, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        this.ctx.strokeStyle = '#FFA500';
+                        this.ctx.lineWidth = 2;
+                        this.ctx.stroke();
+                    }
+                }
+
+                for (let cp of this.checkpoint) {
+                    this.ctx.fillStyle = '#00FF00';
+                    this.ctx.fillRect(cp.x - 15, cp.y - 15, 30, 30);
+                    this.ctx.font = 'bold 20px Arial';
+                    this.ctx.fillStyle = '#000';
+                    this.ctx.fillText('🚩', cp.x - 8, cp.y + 6);
+                }
+
+                this.ctx.fillStyle = '#FFD700';
+                this.ctx.fillRect(this.levelEnd.x - 20, this.levelEnd.y - 20, 40, 40);
+                this.ctx.fillStyle = '#000';
+                this.ctx.font = 'bold 20px Arial';
+                this.ctx.fillText('🏁', this.levelEnd.x - 10, this.levelEnd.y + 6);
+
+                if (this.player) {
+                    this.player.draw(this.ctx);
+                }
+
+                if (gameState.debug) {
+                    this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                    this.ctx.font = '12px Arial';
+                    this.ctx.fillText(`X: ${this.player.x.toFixed(0)} Y: ${this.player.y.toFixed(0)}`, 10, 30);
+                    this.ctx.fillText(`VX: ${this.player.velocityX.toFixed(2)} VY: ${this.player.velocityY.toFixed(2)}`, 10, 50);
+                }
+            }
+
+            updateUI() {
+                document.getElementById('hudDeaths').textContent = this.player?.deaths || 0;
+                document.getElementById('hudCoins').textContent = playerProgress.coins;
+
+                const elapsed = Math.floor((Date.now() - (this.player?.levelStartTime || Date.now())) / 1000);
+                const mins = Math.floor(elapsed / 60);
+                const secs = elapsed % 60;
+                document.getElementById('hudTimer').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+                document.getElementById('playerDisplay').textContent = `👤 ${playerProgress.username}`;
+                document.getElementById('statsDisplay').innerHTML = `💰 ${playerProgress.coins} | 🏆 ${playerProgress.achievements.size}/200 | ⏳ ${Math.floor(playerProgress.playtime / 3600)}h`;
+                document.getElementById('shopCoins').textContent = playerProgress.coins;
+            }
+
+            completeLevel() {
+                gameState.isPlaying = false;
+                const levelId = (gameState.currentWorld - 1) * 10 + gameState.currentLevel;
+                playerProgress.completedLevels.add(levelId);
+                achievements.unlock(levelId - 1);
+                accountSystem.save();
+
+                const elapsed = Math.floor((Date.now() - this.player.levelStartTime) / 1000);
+                document.getElementById('finalTime').textContent = `${Math.floor(elapsed / 60)}:${(elapsed % 60).toString().padStart(2, '0')}`;
+                document.getElementById('finalDeaths').textContent = this.player.deaths;
+                document.getElementById('finalCoins').textContent = playerProgress.coins;
+                document.getElementById('totalCoins').textContent = this.items.length + 10;
+                document.getElementById('newAchievements').textContent = '1';
+
+                document.getElementById('levelComplete').classList.remove('hidden');
+                document.getElementById('hud').classList.add('hidden');
+            }
+
+            nextLevel() {
+                document.getElementById('levelComplete').classList.add('hidden');
+                if (gameState.currentLevel < CONST.LEVELS_PER_WORLD) {
+                    this.startLevel(gameState.currentWorld, gameState.currentLevel + 1);
+                } else if (gameState.currentWorld < CONST.WORLDS) {
+                    this.startLevel(gameState.currentWorld + 1, 1);
+                } else {
+                    this.goToMenu();
+                }
+            }
+
+            restartLevel() {
+                this.startLevel(gameState.currentWorld, gameState.currentLevel);
+            }
+
+            pause() {
+                gameState.isPaused = true;
+                document.getElementById('pauseMenu').classList.remove('hidden');
+            }
+
+            resume() {
+                gameState.isPaused = false;
+                document.getElementById('pauseMenu').classList.add('hidden');
+            }
+
+            goToMenu() {
+                gameState.isPlaying = false;
+                gameState.isPaused = false;
+                document.getElementById('levelComplete').classList.add('hidden');
+                document.getElementById('pauseMenu').classList.add('hidden');
+                document.getElementById('hud').classList.add('hidden');
+                document.getElementById('mainMenu').classList.remove('hidden');
+                document.getElementById('levelSelect').classList.add('hidden');
+                document.getElementById('levelChooser').classList.add('hidden');
+            }
+
+            showShop() {
+                document.getElementById('mainMenu').classList.add('hidden');
+                document.getElementById('shopMenu').classList.remove('hidden');
+                this.renderShop();
+            }
+
+            renderShop() {
+                const grid = document.getElementById('shopGrid');
+                grid.innerHTML = '';
+                for (let skin of shopSystem.skins) {
+                    const item = document.createElement('div');
+                    item.className = 'shop-item';
+                    if (playerProgress.skins.has(skin.id)) {
+                        item.classList.add('owned');
+                        item.innerHTML = `<div class="shop-item-preview" style="background: ${skin.color}"></div><p>✓ Owned</p>`;
+                    } else {
+                        item.innerHTML = `<div class="shop-item-preview" style="background: ${skin.color}"></div><p class="shop-item-price">💰 ${skin.price}</p>`;
+                        item.onclick = () => {
+                            const msg = shopSystem.buySkin(skin.id);
+                            if (msg.includes('purchased')) {
+                                this.renderShop();
+                                this.updateUI();
+                            } else {
+                                alert(msg);
+                            }
+                        };
+                    }
+                    grid.appendChild(item);
+                }
+            }
+
+            showAccount() {
+                document.getElementById('mainMenu').classList.add('hidden');
+                document.getElementById('accountMenu').classList.remove('hidden');
+                const content = document.getElementById('accountContent');
+
+                if (playerProgress.isLoggedIn) {
+                    content.innerHTML = `
+                        <div class="account-info">
+                            <div>👤 Logged in as: <strong>${playerProgress.username}</strong></div>
+                            <div>💰 Coins: <strong>${playerProgress.coins}</strong></div>
+                            <div>🏆 Achievements: <strong>${playerProgress.achievements.size}/200</strong></div>
+                            <div>💀 Total Deaths: <strong>${playerProgress.deaths}</strong></div>
+                        </div>
+                        <button class="menu-button" onclick="game.logout()">🚪 LOGOUT</button>
+                    `;
+                } else {
+                    content.innerHTML = `
+                        <div class="auth-form">
+                            <input type="text" id="authUsername" placeholder="Username" />
+                            <input type="password" id="authPassword" placeholder="Password" />
+                            <button class="menu-button" onclick="game.loginAccount()">LOGIN</button>
+                            <button class="menu-button" onclick="game.registerAccount()">REGISTER</button>
+                        </div>
+                        <button class="menu-button" onclick="game.continueAsGuest()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">CONTINUE AS GUEST</button>
+                    `;
+                }
+            }
+
+            loginAccount() {
+                const username = document.getElementById('authUsername').value;
+                const password = document.getElementById('authPassword').value;
+                if (!username || !password) {
+                    alert('Please enter username and password');
+                    return;
+                }
+                const msg = accountSystem.login(username, password);
+                alert(msg);
+                this.showAccount();
+            }
+
+            registerAccount() {
+                const username = document.getElementById('authUsername').value;
+                const password = document.getElementById('authPassword').value;
+                if (!username || !password) {
+                    alert('Please enter username and password');
+                    return;
+                }
+                const msg = accountSystem.register(username, password);
+                alert(msg);
+            }
+
+            logout() {
+                accountSystem.logout();
+                playerProgress.isLoggedIn = false;
+                playerProgress.username = 'Guest';
+                this.showAccount();
+            }
+
+            continueAsGuest() {
+                this.goToMenu();
+            }
+
+            showTutorial() {
+                document.getElementById('mainMenu').classList.add('hidden');
+                document.getElementById('tutorialMenu').classList.remove('hidden');
+            }
+
+            showSettings() {
+                document.getElementById('mainMenu').classList.add('hidden');
+                document.getElementById('settingsMenu').classList.remove('hidden');
+
+                document.getElementById('soundToggle').onchange = (e) => {
+                    gameState.soundOn = e.target.checked;
+                };
+                document.getElementById('musicToggle').onchange = (e) => {
+                    gameState.musicOn = e.target.checked;
+                };
+                document.getElementById('volumeSlider').onchange = (e) => {
+                    gameState.volume = e.target.value;
+                    document.getElementById('volumePercent').textContent = e.target.value + '%';
+                };
+                document.getElementById('dashType').onchange = (e) => {
+                    gameState.dashType = e.target.value;
+                };
+            }
+
+            showAchievements() {
+                document.getElementById('pauseMenu').classList.add('hidden');
+                document.getElementById('achievementsMenu').classList.remove('hidden');
+
+                const list = document.getElementById('achievementsList');
+                list.innerHTML = '';
+
+                for (let ach of achievements.list) {
+                    const item = document.createElement('div');
+                    item.className = 'achievement-item';
+                    const unlocked = playerProgress.achievements.has(ach.id);
+                    if (unlocked) {
+                        item.classList.add('unlocked');
+                        item.innerHTML = `<h3>🏆</h3><p>${ach.title}</p><p style="font-size: 12px; color: #FFD700;">+${ach.reward}</p>`;
+                    } else {
+                        item.classList.add('locked');
+                        item.innerHTML = `<h3>🔒</h3><p>${ach.title}</p><p style="font-size: 12px;">????</p>`;
+                    }
+                    list.appendChild(item);
+                }
+
+                document.getElementById('achievementStats').innerHTML = `
+                    <p>🏆 <strong>${playerProgress.achievements.size} / ${achievements.list.length}</strong></p>
+                    <p>💰 Earned: <strong>${Array.from(playerProgress.achievements).reduce((sum, id) => sum + (achievements.list[id]?.reward || 0), 0)}</strong></p>
+                `;
+            }
+
+            closeAchievements() {
+                document.getElementById('achievementsMenu').classList.add('hidden');
+                document.getElementById('pauseMenu').classList.remove('hidden');
+            }
+        }
+
+        // Initialize
+        const game = new Game();
+    </script>
+</body>
+</html>

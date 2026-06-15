@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate 2D Platformer - Enhanced Graphics</title>
+    <title>LEGEND OF PYROFORMER - Epic 3D Adventure</title>
     <style>
         * {
             margin: 0;
@@ -12,64 +12,107 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
             overflow: hidden;
+            color: #fff;
         }
 
-        canvas {
+        #canvas {
             display: block;
-            border: 3px solid #333;
-            box-shadow: 0 0 30px rgba(100, 200, 255, 0.5);
+            width: 100vw;
+            height: 100vh;
         }
 
-        /* UI Overlays */
-        .ui-overlay {
-            position: absolute;
+        /* UI */
+        .hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .hud-section {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 25px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            pointer-events: auto;
+        }
+
+        .hud-text {
+            margin: 5px 0;
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .health-bar {
+            width: 200px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #ff4444;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4444, #ff8888);
+            width: 100%;
+            transition: width 0.3s;
+        }
+
+        .menu-overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 1000;
-            font-family: 'Arial', sans-serif;
-            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
         }
 
-        .ui-overlay.hidden {
+        .menu-overlay.hidden {
             display: none;
         }
 
+        .menu-overlay.visible {
+            pointer-events: auto;
+        }
+
         .menu-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a3e 0%, #2d1b4e 100%);
             padding: 40px;
-            border-radius: 20px;
-            text-align: center;
+            border-radius: 15px;
             max-width: 600px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            max-height: 80vh;
-            overflow-y: auto;
-            border: 2px solid #ffd700;
+            border: 3px solid #ffd700;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
         }
 
         .menu-content h1 {
             font-size: 48px;
             margin-bottom: 20px;
-            text-shadow: 3px 3px 8px rgba(0,0,0,0.8);
             color: #ffd700;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.8);
+            letter-spacing: 2px;
         }
 
         .menu-content h2 {
-            font-size: 36px;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #ffd700;
         }
 
         .menu-button {
@@ -77,1501 +120,856 @@
             width: 100%;
             padding: 15px;
             margin: 10px 0;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
             color: white;
-            border: 2px solid #ff1493;
-            border-radius: 10px;
-            font-size: 18px;
+            border: 2px solid #ff4444;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         .menu-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 25px rgba(255, 20, 147, 0.6);
-            background: linear-gradient(135deg, #ff1493 0%, #f5576c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.4);
+            background: linear-gradient(135deg, #ff4444, #ff6b35);
         }
 
-        .world-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .world-card {
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid rgba(255,255,255,0.3);
-        }
-
-        .world-card:hover {
-            background: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.6);
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255,255,255,0.5);
-        }
-
-        .level-grid {
+        .achievement-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .level-button {
-            aspect-ratio: 1;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-
-        .level-button:hover {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            transform: scale(1.05);
-        }
-
-        .level-button.completed {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        }
-
-        .hud {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            display: flex;
-            justify-content: space-between;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            z-index: 100;
-        }
-
-        .hud.hidden {
-            display: none;
-        }
-
-        .hud-section {
-            background: rgba(0,0,0,0.7);
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 2px solid rgba(255,255,255,0.5);
-            backdrop-filter: blur(5px);
-        }
-
-        .tutorial-content, .settings-content {
-            text-align: left;
-            max-height: 400px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-        }
-
-        .tutorial-content h3 {
-            color: #ffd700;
-            margin-top: 15px;
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-
-        .tutorial-content p {
-            margin: 5px 0;
-            font-size: 14px;
-            color: rgba(255,255,255,0.9);
-        }
-
-        .achievement-list {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            max-height: 400px;
+            margin: 20px 0;
+            max-height: 300px;
             overflow-y: auto;
         }
 
         .achievement-item {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 8px;
             text-align: center;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            font-size: 12px;
         }
 
         .achievement-item.unlocked {
-            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
             border-color: #ffed4e;
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
         }
 
-        .achievement-item.locked {
-            opacity: 0.5;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
         }
 
-        .level-stats {
-            text-align: left;
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 18px;
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            color: #ffd700;
             font-weight: bold;
         }
 
-        .scrollbar-custom::-webkit-scrollbar {
-            width: 8px;
+        .stat-label {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
         }
 
-        .scrollbar-custom::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
+        .dialogue-box {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            border: 2px solid #ffd700;
+            z-index: 500;
+            max-height: 150px;
+            overflow-y: auto;
+            pointer-events: auto;
         }
 
-        .scrollbar-custom::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.3);
-            border-radius: 4px;
+        .dialogue-box.hidden {
+            display: none;
         }
 
-        .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.5);
+        .npc-name {
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 14px;
         }
 
-        .pause-overlay {
+        .dialogue-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #ddd;
+        }
+
+        .hotbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+            pointer-events: auto;
+        }
+
+        .hotbar-slot {
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .hotbar-slot:hover, .hotbar-slot.active {
+            background: rgba(255, 215, 0, 0.3);
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .minimap {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            z-index: 100;
+        }
+
+        #minimapCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+        }
+
+        .loading-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 999;
+            background: linear-gradient(135deg, #1a1a3e 0%, #2d1b4e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
         }
 
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
-            50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.8); }
+        .loading-text {
+            color: #ffd700;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         }
 
-        .menu-button:active {
-            animation: pulse 0.3s;
+        .loading-bar {
+            width: 300px;
+            height: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #ffd700;
+            border-radius: 5px;
+            overflow: hidden;
         }
 
-        @media (max-width: 768px) {
-            .world-grid { grid-template-columns: 1fr; }
-            .level-grid { grid-template-columns: repeat(4, 1fr); }
-            .achievement-list { grid-template-columns: repeat(2, 1fr); }
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b35, #ffd700);
+            width: 0%;
+            transition: width 0.3s;
         }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
-    
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-text">🌟 LEGEND OF PYROFORMER 🌟</div>
+        <div class="loading-bar">
+            <div id="loadingProgress" class="loading-progress"></div>
+        </div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <!-- HUD -->
+    <div class="hud">
+        <div class="hud-section">
+            <div class="hud-text">❤️ Health</div>
+            <div class="health-bar">
+                <div id="healthFill" class="health-fill"></div>
+            </div>
+            <div class="hud-text" id="hudLevel">📍 Level: Forest</div>
+            <div class="hud-text" id="hudCoins">💰 Gold: 0</div>
+        </div>
+        <div class="hud-section">
+            <div class="hud-text" id="hudStats">⚔️ Combat Ready</div>
+            <div class="hud-text" id="hudTime">⏰ Time: 0:00</div>
+            <div class="hud-text" id="hudBiome">🗺️ Forest Biome</div>
+        </div>
+    </div>
+
+    <!-- Minimap -->
+    <div class="minimap">
+        <canvas id="minimapCanvas"></canvas>
+    </div>
+
+    <!-- Hotbar -->
+    <div class="hotbar" id="hotbar"></div>
+
+    <!-- Dialogue Box -->
+    <div id="dialogueBox" class="dialogue-box hidden">
+        <div class="npc-name" id="npcName">NPC</div>
+        <div class="dialogue-text" id="dialogueText">Hello, adventurer!</div>
+    </div>
+
     <!-- Main Menu -->
-    <div id="mainMenu" class="ui-overlay">
-        <div class="menu-content scrollbar-custom">
-            <h1>✨ ULTIMATE PLATFORMER ✨</h1>
-            <p style="margin-bottom: 30px; font-size: 18px; color: #ffd700;">6 Mystical Worlds | 60 Epic Levels</p>
-            <button class="menu-button" onclick="game.playGame()">▶ PLAY</button>
-            <button class="menu-button" onclick="game.showLevelSelect()">🗺️ LEVEL SELECT</button>
-            <button class="menu-button" onclick="game.showShop()">🛍️ SHOP</button>
-            <button class="menu-button" onclick="game.showAccount()">👤 ACCOUNT</button>
-            <button class="menu-button" onclick="game.showTutorial()">📖 TUTORIAL</button>
-            <button class="menu-button" onclick="game.showSettings()">⚙️ SETTINGS</button>
-            <div class="player-info" style="margin-top: 30px;">
-                <div id="playerDisplay" style="font-size: 18px; margin-bottom: 10px;"></div>
-                <div id="statsDisplay"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Level Select Menu -->
-    <div id="levelSelect" class="ui-overlay hidden">
-        <div class="menu-content scrollbar-custom">
-            <h2>🌍 SELECT WORLD</h2>
-            <div class="world-grid" id="worldSelectGrid"></div>
-            <button class="menu-button" onclick="game.goToMenu()">← BACK</button>
-        </div>
-    </div>
-
-    <!-- Level Chooser -->
-    <div id="levelChooser" class="ui-overlay hidden">
-        <div class="menu-content scrollbar-custom">
-            <h2 id="worldTitle">WORLD 1 - CRYSTAL CAVES</h2>
-            <div class="level-grid" id="levelGrid"></div>
-            <button class="menu-button" onclick="game.showLevelSelect()">← BACK</button>
-        </div>
-    </div>
-
-    <!-- Shop Menu -->
-    <div id="shopMenu" class="ui-overlay hidden">
-        <div class="menu-content scrollbar-custom">
-            <h2>🛍️ COSMETIC SHOP</h2>
-            <div style="margin-bottom: 20px; font-size: 18px; font-weight: bold;">💰 Coins: <span id="shopCoins">0</span></div>
-            <div class="level-grid" id="shopGrid"></div>
-            <button class="menu-button" onclick="game.goToMenu()">← BACK</button>
-        </div>
-    </div>
-
-    <!-- Account Menu -->
-    <div id="accountMenu" class="ui-overlay hidden">
-        <div class="menu-content scrollbar-custom">
-            <h2>👤 ACCOUNT</h2>
-            <div id="accountContent"></div>
-            <button class="menu-button" onclick="game.goToMenu()">← BACK</button>
-        </div>
-    </div>
-
-    <!-- Pause Menu -->
-    <div id="pauseMenu" class="ui-overlay hidden">
-        <div class="pause-overlay"></div>
+    <div id="mainMenu" class="menu-overlay visible">
         <div class="menu-content">
-            <h1>⏸️ PAUSED</h1>
-            <button class="menu-button" onclick="game.resume()">▶ RESUME</button>
-            <button class="menu-button" onclick="game.restartLevel()">🔄 RESTART</button>
+            <h1>⚔️ LEGEND OF PYROFORMER ⚔️</h1>
+            <p style="margin-bottom: 30px; font-size: 16px; color: #ffd700;">An Epic 3D Adventure</p>
+            <button class="menu-button" onclick="game.startGame()">▶ NEW GAME</button>
             <button class="menu-button" onclick="game.showAchievements()">🏆 ACHIEVEMENTS</button>
-            <button class="menu-button" onclick="game.goToMenu()">🏠 MENU</button>
-        </div>
-    </div>
-
-    <!-- Tutorial Menu -->
-    <div id="tutorialMenu" class="ui-overlay hidden">
-        <div class="menu-content scrollbar-custom">
-            <h2>📖 TUTORIAL</h2>
-            <div class="tutorial-content">
-                <h3>🎮 MOVEMENT</h3>
-                <p><strong>WASD / Arrow Keys</strong> - Move left/right</p>
-                <p><strong>SPACE</strong> - Jump (double jump available)</p>
-                <p><strong>S / Down Arrow</strong> - Duck</p>
-                
-                <h3>⚡ ADVANCED TECHNIQUES</h3>
-                <p><strong>Double Tap SHIFT</strong> - Dash (invincible during dash)</p>
-                <p><strong>Hold SHIFT</strong> - Sprint</p>
-                <p><strong>Wall Jump</strong> - Jump while against a wall</p>
-                
-                <h3>🎮 MECHANICS</h3>
-                <p>🚩 <strong>Checkpoints</strong> - Save your progress</p>
-                <p>💰 <strong>Coins</strong> - Collect for shop items</p>
-                <p>⚠️ <strong>Hazards</strong> - Avoid spikes, saws & lasers</p>
-                
-                <h3>🎮 CONTROLS</h3>
-                <p><strong>P or ESC</strong> - Pause</p>
-                <p><strong>R</strong> - Restart level</p>
-                <p><strong>/ (Slash)</strong> - Debug mode</p>
-            </div>
-            <button class="menu-button" onclick="game.goToMenu()">← BACK</button>
-        </div>
-    </div>
-
-    <!-- Settings Menu -->
-    <div id="settingsMenu" class="ui-overlay hidden">
-        <div class="menu-content scrollbar-custom">
-            <h2>⚙️ SETTINGS</h2>
-            <div class="settings-content">
-                <label>
-                    <input type="checkbox" id="soundToggle" checked>
-                    🔊 Sound Effects
-                </label>
-                <label>
-                    <input type="checkbox" id="musicToggle" checked>
-                    🎵 Background Music
-                </label>
-                <label>
-                    📢 Volume: <input type="range" id="volumeSlider" min="0" max="100" value="70">
-                </label>
-            </div>
-            <button class="menu-button" onclick="game.goToMenu()">← BACK</button>
+            <button class="menu-button" onclick="game.showStats()">📊 STATS</button>
+            <button class="menu-button" onclick="game.showSettings()">⚙️ SETTINGS</button>
         </div>
     </div>
 
     <!-- Achievements Menu -->
-    <div id="achievementsMenu" class="ui-overlay hidden">
-        <div class="menu-content scrollbar-custom">
-            <h2>🏆 ACHIEVEMENTS</h2>
-            <div style="margin-bottom: 20px; font-size: 16px;">
-                <div id="achievementStats"></div>
-            </div>
-            <div class="achievement-list scrollbar-custom" id="achievementsList"></div>
-            <button class="menu-button" onclick="game.closeAchievements()">← BACK</button>
-        </div>
-    </div>
-
-    <!-- Level Complete Menu -->
-    <div id="levelComplete" class="ui-overlay hidden">
+    <div id="achievementsMenu" class="menu-overlay hidden">
         <div class="menu-content">
-            <h1>🎉 LEVEL COMPLETE!</h1>
-            <div class="level-stats">
-                <p>⏱️ Time: <span id="finalTime">0:00</span></p>
-                <p>💀 Deaths: <span id="finalDeaths">0</span></p>
-                <p>💰 Coins: <span id="finalCoins">0</span></p>
-            </div>
-            <button class="menu-button" onclick="game.nextLevel()">→ NEXT LEVEL</button>
-            <button class="menu-button" onclick="game.goToMenu()">🏠 MENU</button>
+            <h2>🏆 ACHIEVEMENTS</h2>
+            <div id="achievementsList" class="achievement-grid"></div>
+            <button class="menu-button" onclick="game.backToMenu()">← BACK</button>
         </div>
     </div>
 
-    <!-- HUD -->
-    <div id="hud" class="hud hidden">
-        <div class="hud-section">
-            <div>🌍 Level: <span id="hudLevel">1-1</span></div>
-            <div>💀 Deaths: <span id="hudDeaths">0</span></div>
-        </div>
-        <div class="hud-section">
-            <div id="hudTimer">0:00</div>
-        </div>
-        <div class="hud-section">
-            <div>💰 <span id="hudCoins">0</span></div>
-            <div>🚩 Checkpoints: <span id="hudCheckpoints">0</span></div>
+    <!-- Stats Menu -->
+    <div id="statsMenu" class="menu-overlay hidden">
+        <div class="menu-content">
+            <h2>📊 STATISTICS</h2>
+            <div class="stats-grid" id="statsGrid"></div>
+            <button class="menu-button" onclick="game.backToMenu()">← BACK</button>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"></script>
     <script>
-        // ==================== CONSTANTS ====================
-        const CONST = {
-            CANVAS_WIDTH: 1280,
-            CANVAS_HEIGHT: 720,
-            GRAVITY: 0.6,
-            PLAYER_WIDTH: 24,
-            PLAYER_HEIGHT: 32,
-            BLOCK_SIZE: 40,
-            WORLDS: 3,
-            LEVELS_PER_WORLD: 10,
-            TOTAL_SKINS: 20,
-            TOTAL_ACHIEVEMENTS: 200
-        };
-
-        // ==================== PARTICLE SYSTEM ====================
-        class Particle {
-            constructor(x, y, vx, vy, life, color) {
-                this.x = x;
-                this.y = y;
-                this.vx = vx;
-                this.vy = vy;
-                this.life = life;
-                this.maxLife = life;
-                this.color = color;
-            }
-
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.vy += 0.2;
-                this.life--;
-            }
-
-            draw(ctx) {
-                const alpha = this.life / this.maxLife;
-                ctx.save();
-                ctx.globalAlpha = alpha;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            }
-        }
-
-        let particles = [];
-
-        function createParticles(x, y, count, color) {
-            for (let i = 0; i < count; i++) {
-                const angle = (Math.PI * 2 * i) / count;
-                const speed = 2 + Math.random() * 3;
-                particles.push(new Particle(
-                    x, y,
-                    Math.cos(angle) * speed,
-                    Math.sin(angle) * speed,
-                    20 + Math.random() * 20,
-                    color
-                ));
-            }
-        }
-
-        // ==================== GAME STATE ====================
-        let gameState = {
-            currentWorld: 0,
-            currentLevel: 0,
-            isPlaying: false,
-            isPaused: false,
-            debug: false,
-            soundOn: true,
-            musicOn: true
-        };
-
-        let playerProgress = {
-            username: 'Guest',
-            coins: 0,
-            completedLevels: new Set(),
-            achievements: new Set(),
-            deaths: 0,
-            skins: new Set([0]),
-            isLoggedIn: false
-        };
-
-        // ==================== ACCOUNT SYSTEM ====================
-        const accountSystem = {
-            accounts: JSON.parse(localStorage.getItem('accounts') || '{}'),
-            currentUser: localStorage.getItem('currentUser') || null,
-
-            register(username, password) {
-                if (this.accounts[username]) return 'Username already exists';
-                this.accounts[username] = {
-                    password, coins: 0, completedLevels: [],
-                    achievements: [], deaths: 0, skins: [0]
-                };
-                this.save();
-                return 'Account created!';
-            },
-
-            login(username, password) {
-                const account = this.accounts[username];
-                if (!account || account.password !== password) return 'Invalid credentials';
-                this.currentUser = username;
-                localStorage.setItem('currentUser', username);
-                this.loadAccount();
-                return 'Logged in!';
-            },
-
-            logout() {
-                this.currentUser = null;
-                localStorage.removeItem('currentUser');
-            },
-
-            save() {
-                if (this.currentUser && this.accounts[this.currentUser]) {
-                    this.accounts[this.currentUser] = {
-                        password: this.accounts[this.currentUser].password,
-                        coins: playerProgress.coins,
-                        completedLevels: Array.from(playerProgress.completedLevels),
-                        achievements: Array.from(playerProgress.achievements),
-                        deaths: playerProgress.deaths,
-                        skins: Array.from(playerProgress.skins)
-                    };
-                }
-                localStorage.setItem('accounts', JSON.stringify(this.accounts));
-            },
-
-            loadAccount() {
-                if (this.currentUser && this.accounts[this.currentUser]) {
-                    const acc = this.accounts[this.currentUser];
-                    playerProgress.username = this.currentUser;
-                    playerProgress.coins = acc.coins || 0;
-                    playerProgress.completedLevels = new Set(acc.completedLevels || []);
-                    playerProgress.achievements = new Set(acc.achievements || []);
-                    playerProgress.deaths = acc.deaths || 0;
-                    playerProgress.skins = new Set(acc.skins || [0]);
-                    playerProgress.isLoggedIn = true;
-                }
-            }
-        };
-
-        if (accountSystem.currentUser) accountSystem.loadAccount();
-
-        // ==================== ACHIEVEMENTS ====================
-        const achievements = {
-            list: Array.from({length: 200}, (_, i) => ({
-                id: i,
-                title: `Achievement ${i+1}`,
-                reward: 5 + Math.floor(Math.random() * 45)
-            })),
-
-            unlock(id) {
-                if (!playerProgress.achievements.has(id)) {
-                    playerProgress.achievements.add(id);
-                    const ach = this.list[id];
-                    if (ach) playerProgress.coins += ach.reward;
-                    accountSystem.save();
-                }
-            }
-        };
-
-        // ==================== SHOP ====================
-        const shopSystem = {
-            skins: Array.from({length: CONST.TOTAL_SKINS}, (_, i) => ({
-                id: i,
-                name: `Skin ${i+1}`,
-                price: (i + 1) * 50,
-                color: `hsl(${(i * 18) % 360}, 70%, 50%)`
-            })),
-
-            buySkin(id) {
-                const skin = this.skins[id];
-                if (!skin) return 'Skin not found';
-                if (playerProgress.skins.has(id)) return 'Already owned';
-                if (playerProgress.coins < skin.price) return 'Not enough coins';
-                playerProgress.coins -= skin.price;
-                playerProgress.skins.add(id);
-                accountSystem.save();
-                return 'Skin purchased!';
-            }
-        };
-
-        // ==================== ENHANCED LEVEL GENERATOR ====================
-        class LevelGenerator {
-            constructor(world, level) {
-                this.world = world;
-                this.level = level;
-                this.seed = world * 1000 + level;
-            }
-
-            seededRandom() {
-                const x = Math.sin(this.seed++) * 10000;
-                return x - Math.floor(x);
-            }
-
-            generate() {
-                const blocks = [];
-                const hazards = [];
-                const items = [];
-                const checkpoint = [];
-
-                // Generate ground
-                for (let x = 0; x < CONST.CANVAS_WIDTH; x += CONST.BLOCK_SIZE) {
-                    blocks.push({
-                        x, y: CONST.CANVAS_HEIGHT - 80,
-                        width: CONST.BLOCK_SIZE,
-                        height: CONST.BLOCK_SIZE,
-                        type: 'solid',
-                        world: this.world
-                    });
-                }
-
-                const difficulty = 0.3 + (this.level * 0.07);
-
-                if (this.world === 1) {
-                    this.generateCrystalCaves(blocks, hazards, items, checkpoint, difficulty);
-                } else if (this.world === 2) {
-                    this.generateIceCaves(blocks, hazards, items, checkpoint, difficulty);
-                } else if (this.world === 3) {
-                    this.generateLavaCaves(blocks, hazards, items, checkpoint, difficulty);
-                }
-
-                return {
-                    blocks, hazards, items, checkpoint,
-                    start: { x: 100, y: CONST.CANVAS_HEIGHT - 200 },
-                    end: { x: CONST.CANVAS_WIDTH - 100, y: CONST.CANVAS_HEIGHT - 120 }
-                };
-            }
-
-            generateCrystalCaves(blocks, hazards, items, checkpoint, difficulty) {
-                let x = 200;
-                for (let i = 0; i < 5 + this.level; i++) {
-                    blocks.push({
-                        x, y: CONST.CANVAS_HEIGHT - 200 - (i % 3) * 80,
-                        width: CONST.BLOCK_SIZE * 2,
-                        height: CONST.BLOCK_SIZE,
-                        type: 'crystal',
-                        world: 1
-                    });
-                    x += CONST.BLOCK_SIZE * 4;
-                    items.push({ x: x - CONST.BLOCK_SIZE, y: CONST.CANVAS_HEIGHT - 250 - (i % 3) * 80, type: 'coin', sparkle: true });
-                }
-                checkpoint.push({ x: 600, y: CONST.CANVAS_HEIGHT - 150 });
-            }
-
-            generateIceCaves(blocks, hazards, items, checkpoint, difficulty) {
-                let x = 200;
-                for (let i = 0; i < 4 + this.level; i++) {
-                    blocks.push({
-                        x, y: CONST.CANVAS_HEIGHT - 200,
-                        width: CONST.BLOCK_SIZE * 3,
-                        height: CONST.BLOCK_SIZE,
-                        type: 'ice',
-                        world: 2
-                    });
-                    if (i % 2 === 0) {
-                        hazards.push({
-                            x: x + CONST.BLOCK_SIZE,
-                            y: CONST.CANVAS_HEIGHT - 250,
-                            radius: 20,
-                            type: 'saw'
-                        });
-                    }
-                    x += CONST.BLOCK_SIZE * 8;
-                }
-                checkpoint.push({ x: 400, y: CONST.CANVAS_HEIGHT - 150 });
-                checkpoint.push({ x: 800, y: CONST.CANVAS_HEIGHT - 150 });
-            }
-
-            generateLavaCaves(blocks, hazards, items, checkpoint, difficulty) {
-                let x = 200;
-                for (let i = 0; i < 3 + this.level; i++) {
-                    blocks.push({
-                        x, y: CONST.CANVAS_HEIGHT - 200,
-                        width: CONST.BLOCK_SIZE * 2,
-                        height: CONST.BLOCK_SIZE,
-                        type: 'lava',
-                        world: 3
-                    });
-                    blocks.push({
-                        x: x + CONST.BLOCK_SIZE * 4,
-                        y: CONST.CANVAS_HEIGHT - 300,
-                        width: CONST.BLOCK_SIZE * 2,
-                        height: CONST.BLOCK_SIZE,
-                        type: 'lava',
-                        world: 3
-                    });
-                    hazards.push({
-                        x: x + CONST.BLOCK_SIZE * 3,
-                        y: CONST.CANVAS_HEIGHT - 220,
-                        width: 40,
-                        height: 40,
-                        type: 'spike'
-                    });
-                    x += CONST.BLOCK_SIZE * 10;
-                }
-                checkpoint.push({ x: 600, y: CONST.CANVAS_HEIGHT - 150 });
-            }
-        }
-
-        // ==================== ENHANCED PLAYER CLASS ====================
-        class Player {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.width = CONST.PLAYER_WIDTH;
-                this.height = CONST.PLAYER_HEIGHT;
-                this.velocityX = 0;
-                this.velocityY = 0;
-                this.isJumping = false;
-                this.isOnGround = false;
-                this.canDoubleJump = true;
-                this.canDash = true;
-                this.dashCooldown = 0;
-                this.lastShiftPress = 0;
-                this.shiftPressCount = 0;
-                this.currentSkin = 0;
-                this.isDucking = false;
-                this.isSprinting = false;
-                this.checkpointX = x;
-                this.checkpointY = y;
-                this.deaths = 0;
-                this.levelStartTime = Date.now();
-                this.isInvincible = false;
-                this.invincibilityTime = 0;
-                this.animationFrame = 0;
-            }
-
-            update(keys, blocks, hazards, items) {
-                const speed = this.isSprinting ? 8 : 5;
-                if (keys['a'] || keys['arrowleft']) this.velocityX = -speed;
-                else if (keys['d'] || keys['arrowright']) this.velocityX = speed;
-                else this.velocityX = 0;
-
-                this.isDucking = keys['s'] || keys['arrowdown'];
-                this.isSprinting = keys['shift'];
-
-                const now = Date.now();
-                if (keys['shift']) {
-                    if (now - this.lastShiftPress > 300) {
-                        this.shiftPressCount = 0;
-                    }
-                    this.lastShiftPress = now;
-                    this.shiftPressCount++;
-
-                    if (this.shiftPressCount === 2) {
-                        if (this.canDash && this.dashCooldown <= 0) {
-                            this.velocityX *= 3;
-                            this.canDash = false;
-                            this.dashCooldown = 30;
-                            this.isInvincible = true;
-                            this.invincibilityTime = 20;
-                            createParticles(this.x + this.width / 2, this.y + this.height / 2, 8, '#FF69B4');
-                        }
-                    }
-                } else {
-                    this.shiftPressCount = 0;
-                }
-
-                if ((keys[' '] || keys['w'] || keys['arrowup']) && (this.isOnGround || this.canDoubleJump)) {
-                    if (this.isOnGround) {
-                        this.velocityY = -12;
-                        this.canDoubleJump = true;
-                    } else if (this.canDoubleJump) {
-                        this.velocityY = -12;
-                        this.canDoubleJump = false;
-                        createParticles(this.x + this.width / 2, this.y + this.height / 2, 6, '#FFD700');
-                    }
-                    this.isOnGround = false;
-                }
-
-                this.velocityY += CONST.GRAVITY;
-                if (this.velocityY > 15) this.velocityY = 15;
-
-                this.x += this.velocityX;
-                this.y += this.velocityY;
-
-                this.isOnGround = false;
-                for (let block of blocks) {
-                    this.checkCollision(block);
-                }
-
-                if (!this.isInvincible) {
-                    for (let hazard of hazards) {
-                        if (this.checkHazardCollision(hazard)) {
-                            this.respawn();
-                            this.deaths++;
-                        }
-                    }
-                }
-
-                items = items.filter(item => {
-                    if (Math.abs(this.x - item.x) < 30 && Math.abs(this.y - item.y) < 30) {
-                        if (item.type === 'coin') {
-                            playerProgress.coins += 10;
-                            createParticles(item.x, item.y, 10, '#FFD700');
-                        }
-                        return false;
-                    }
-                    return true;
-                });
-
-                if (this.x < 0) this.x = 0;
-                if (this.x + this.width > CONST.CANVAS_WIDTH) this.x = CONST.CANVAS_WIDTH - this.width;
-                if (this.y > CONST.CANVAS_HEIGHT) this.respawn();
-
-                this.dashCooldown--;
-                if (this.isInvincible) {
-                    this.invincibilityTime--;
-                    if (this.invincibilityTime <= 0) this.isInvincible = false;
-                }
-
-                this.animationFrame = (this.animationFrame + 1) % 8;
-                return items;
-            }
-
-            checkCollision(block) {
-                const dx = (this.x + this.width / 2) - (block.x + block.width / 2);
-                const dy = (this.y + this.height / 2) - (block.y + block.height / 2);
-                const distance = Math.max(Math.abs(dx), Math.abs(dy));
-
-                if (distance < this.width / 2 + block.width / 2) {
-                    if (dy > 0) {
-                        this.y = block.y + block.height;
-                        this.velocityY = 0;
-                    } else if (dy < 0) {
-                        this.y = block.y - this.height;
-                        this.velocityY = 0;
-                        this.isOnGround = true;
-                        this.canDoubleJump = true;
-                    }
-
-                    if (dx > 0) {
-                        this.x = block.x + block.width;
-                    } else if (dx < 0) {
-                        this.x = block.x - this.width;
-                    }
-                }
-            }
-
-            checkHazardCollision(hazard) {
-                const dx = (this.x + this.width / 2) - (hazard.x + (hazard.width || 40) / 2);
-                const dy = (this.y + this.height / 2) - (hazard.y + (hazard.height || 40) / 2);
-                const distance = Math.hypot(dx, dy);
-                return distance < this.width / 2 + (hazard.radius || 20);
-            }
-
-            respawn() {
-                this.x = this.checkpointX;
-                this.y = this.checkpointY;
-                this.velocityY = 0;
-                createParticles(this.x, this.y, 12, '#FF4444');
-            }
-
-            draw(ctx) {
-                const skin = playerProgress.skins.has(this.currentSkin) ? this.currentSkin : 0;
-                const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181', '#AA96DA', '#FCBAD3', '#A8D8EA', '#FFD3B6', '#FFAAA5', '#FF8B94', '#A8E6CF', '#FFD3B6', '#FFAAA5', '#FF8B94', '#C7CEEA', '#FFDDC1', '#B5EAD7', '#FFB4B4', '#FFFFBA'];
-                
-                ctx.save();
-                if (this.isInvincible) {
-                    ctx.globalAlpha = 0.7 + Math.sin(this.animationFrame * 0.5) * 0.3;
-                    ctx.shadowColor = '#FF69B4';
-                    ctx.shadowBlur = 10;
-                }
-
-                ctx.fillStyle = colors[skin % colors.length];
-                ctx.fillRect(this.x, this.y, this.width, this.height);
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(this.x, this.y, this.width, this.height);
-
-                // Eyes
-                ctx.fillStyle = '#000';
-                ctx.fillRect(this.x + 6, this.y + 8, 4, 4);
-                ctx.fillRect(this.x + 14, this.y + 8, 4, 4);
-
-                ctx.restore();
-            }
-        }
-
-        // ==================== ENHANCED BACKGROUND RENDERER ====================
-        class BackgroundRenderer {
-            constructor(world) {
-                this.world = world;
-                this.parallaxOffset = 0;
-            }
-
-            drawCrystalCaveBackground(ctx) {
-                // Sky
-                const gradient = ctx.createLinearGradient(0, 0, 0, CONST.CANVAS_HEIGHT);
-                gradient.addColorStop(0, '#1a0033');
-                gradient.addColorStop(0.5, '#4d0099');
-                gradient.addColorStop(1, '#6600cc');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, CONST.CANVAS_WIDTH, CONST.CANVAS_HEIGHT);
-
-                // Glowing crystals in background
-                ctx.save();
-                ctx.globalAlpha = 0.4;
-                for (let i = 0; i < 5; i++) {
-                    const x = (i * 300 + this.parallaxOffset * 0.3) % CONST.CANVAS_WIDTH;
-                    ctx.fillStyle = `hsl(${280 + i * 20}, 100%, 60%)`;
-                    ctx.beginPath();
-                    ctx.moveTo(x, 100);
-                    ctx.lineTo(x + 40, 150);
-                    ctx.lineTo(x - 40, 150);
-                    ctx.closePath();
-                    ctx.fill();
-
-                    ctx.fillStyle = `hsl(${280 + i * 20}, 100%, 80%)`;
-                    ctx.globalAlpha = 0.6;
-                    ctx.beginPath();
-                    ctx.arc(x, 125, 20, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                ctx.restore();
-            }
-
-            drawIceCaveBackground(ctx) {
-                // Sky
-                const gradient = ctx.createLinearGradient(0, 0, 0, CONST.CANVAS_HEIGHT);
-                gradient.addColorStop(0, '#e0f7ff');
-                gradient.addColorStop(0.5, '#b3e5ff');
-                gradient.addColorStop(1, '#80deea');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, CONST.CANVAS_WIDTH, CONST.CANVAS_HEIGHT);
-
-                // Falling snow particles
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-                for (let i = 0; i < 20; i++) {
-                    const x = (i * 100 + this.parallaxOffset) % CONST.CANVAS_WIDTH;
-                    const y = (i * 50 + Date.now() * 0.05) % CONST.CANVAS_HEIGHT;
-                    ctx.beginPath();
-                    ctx.arc(x, y, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                // Icicles
-                ctx.fillStyle = 'rgba(200, 230, 255, 0.7)';
-                for (let i = 0; i < 8; i++) {
-                    const x = i * 160;
-                    ctx.beginPath();
-                    ctx.moveTo(x + 40, 0);
-                    ctx.lineTo(x + 50, 100);
-                    ctx.lineTo(x + 30, 100);
-                    ctx.closePath();
-                    ctx.fill();
-                }
-            }
-
-            drawLavaCaveBackground(ctx) {
-                // Sky
-                const gradient = ctx.createLinearGradient(0, 0, 0, CONST.CANVAS_HEIGHT);
-                gradient.addColorStop(0, '#ff4500');
-                gradient.addColorStop(0.5, '#ff6347');
-                gradient.addColorStop(1, '#ff7f50');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, CONST.CANVAS_WIDTH, CONST.CANVAS_HEIGHT);
-
-                // Lava bubbles
-                ctx.fillStyle = 'rgba(255, 200, 0, 0.3)';
-                for (let i = 0; i < 15; i++) {
-                    const x = (i * 100 + this.parallaxOffset * 0.2) % CONST.CANVAS_WIDTH;
-                    const y = 400 + Math.sin(Date.now() * 0.002 + i) * 50;
-                    ctx.beginPath();
-                    ctx.arc(x, y, 30 + Math.sin(Date.now() * 0.001 + i) * 10, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                // Glowing rocks
-                ctx.fillStyle = 'rgba(255, 100, 0, 0.4)';
-                for (let i = 0; i < 6; i++) {
-                    ctx.fillRect(i * 200, CONST.CANVAS_HEIGHT - 150, 150, 120);
-                }
-            }
-
-            draw(ctx) {
-                if (gameState.currentWorld === 1) {
-                    this.drawCrystalCaveBackground(ctx);
-                } else if (gameState.currentWorld === 2) {
-                    this.drawIceCaveBackground(ctx);
-                } else if (gameState.currentWorld === 3) {
-                    this.drawLavaCaveBackground(ctx);
-                }
-            }
-        }
-
-        // ==================== ENHANCED BLOCK RENDERER ====================
-        function drawBlock(ctx, block) {
-            if (block.type === 'crystal') {
-                // Crystal block with gradient and glow
-                const gradient = ctx.createLinearGradient(block.x, block.y, block.x + block.width, block.y + block.height);
-                gradient.addColorStop(0, '#00ff99');
-                gradient.addColorStop(0.5, '#00ccff');
-                gradient.addColorStop(1, '#9900ff');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(block.x, block.y, block.width, block.height);
-
-                // Crystal sparkle effect
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-                ctx.fillRect(block.x + 5, block.y + 5, 8, 8);
-                ctx.fillRect(block.x + block.width - 13, block.y + block.height - 13, 8, 8);
-
-                // Outline
-                ctx.strokeStyle = '#ffff00';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(block.x, block.y, block.width, block.height);
-
-                // Glow
-                ctx.shadowColor = '#00ffff';
-                ctx.shadowBlur = 10;
-                ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(block.x - 2, block.y - 2, block.width + 4, block.height + 4);
-            } else if (block.type === 'ice') {
-                // Ice block with transparency and reflection
-                const gradient = ctx.createLinearGradient(block.x, block.y, block.x + block.width, block.y + block.height);
-                gradient.addColorStop(0, 'rgba(200, 230, 255, 0.8)');
-                gradient.addColorStop(0.5, 'rgba(150, 200, 255, 0.9)');
-                gradient.addColorStop(1, 'rgba(100, 180, 255, 0.8)');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(block.x, block.y, block.width, block.height);
-
-                // Reflection lines
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(block.x + 5, block.y + 10);
-                ctx.lineTo(block.x + block.width - 5, block.y + 10);
-                ctx.stroke();
-
-                // Outline
-                ctx.strokeStyle = 'rgba(100, 150, 255, 1)';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(block.x, block.y, block.width, block.height);
-            } else if (block.type === 'lava') {
-                // Lava block with animated gradient
-                const time = Date.now() * 0.003;
-                const gradient = ctx.createLinearGradient(block.x, block.y + Math.sin(time) * 5, block.x + block.width, block.y + block.height);
-                gradient.addColorStop(0, '#ff4500');
-                gradient.addColorStop(0.5, '#ff6347');
-                gradient.addColorStop(1, '#ff7f50');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(block.x, block.y, block.width, block.height);
-
-                // Lava detail
-                ctx.fillStyle = 'rgba(255, 200, 0, 0.4)';
-                for (let i = 0; i < 3; i++) {
-                    ctx.beginPath();
-                    ctx.arc(
-                        block.x + (block.width / 3) * (i + 1) + Math.sin(time + i) * 10,
-                        block.y + block.height / 2 + Math.cos(time + i) * 5,
-                        5 + Math.sin(time + i) * 3,
-                        0,
-                        Math.PI * 2
-                    );
-                    ctx.fill();
-                }
-
-                // Outline
-                ctx.strokeStyle = '#ffaa00';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(block.x, block.y, block.width, block.height);
-            } else {
-                // Standard solid block
-                ctx.fillStyle = '#8B4513';
-                ctx.fillRect(block.x, block.y, block.width, block.height);
-                ctx.strokeStyle = '#654321';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(block.x, block.y, block.width, block.height);
-            }
-        }
-
         // ==================== GAME ENGINE ====================
         class Game {
             constructor() {
-                this.canvas = document.getElementById('gameCanvas');
-                this.ctx = this.canvas.getContext('2d');
-                this.canvas.width = CONST.CANVAS_WIDTH;
-                this.canvas.height = CONST.CANVAS_HEIGHT;
+                this.canvas = document.getElementById('canvas');
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
+                this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFShadowShadowMap;
+                this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                this.renderer.toneMappingExposure = 1.2;
 
+                this.world = new CANNON.World();
+                this.world.gravity.set(0, -30, 0);
+                this.world.defaultContactMaterial.friction = 0.3;
+
+                this.gameState = 'menu';
+                this.isPlaying = false;
+                this.isPaused = false;
                 this.player = null;
-                this.blocks = [];
-                this.hazards = [];
-                this.items = [];
-                this.checkpoint = [];
-                this.levelStart = null;
-                this.levelEnd = null;
-                this.backgroundRenderer = null;
+                this.npcs = [];
+                this.enemies = [];
+                this.gameTime = 0;
+                this.playerData = {
+                    health: 100,
+                    maxHealth: 100,
+                    gold: 0,
+                    level: 1,
+                    experience: 0,
+                    deaths: 0,
+                    achievements: new Set(),
+                };
 
-                this.keys = {};
-                this.setupInputs();
+                this.setupScene();
+                this.setupLights();
+                this.setupEventListeners();
+                this.setupAchievements();
+                this.hideLoadingScreen();
+
+                window.addEventListener('resize', () => this.onWindowResize());
                 this.animate();
-                this.updateUI();
             }
 
-            setupInputs() {
-                document.addEventListener('keydown', (e) => {
-                    const key = e.key.toLowerCase();
-                    this.keys[key] = true;
+            setupScene() {
+                this.scene.fog = new THREE.Fog(0x1a1a3e, 200, 1000);
+                this.scene.background = new THREE.Color(0x1a1a3e);
+            }
 
-                    if (key === 'p' || key === 'escape') {
-                        if (gameState.isPlaying && !gameState.isPaused) {
-                            this.pause();
-                        } else if (gameState.isPaused) {
-                            this.resume();
-                        }
-                    }
-                    if (key === 'r' && gameState.isPlaying) {
-                        this.restartLevel();
-                    }
-                    if (key === '/' && gameState.isPlaying) {
-                        gameState.debug = !gameState.debug;
-                    }
+            setupLights() {
+                // Main directional light
+                const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+                dirLight.position.set(150, 200, 150);
+                dirLight.castShadow = true;
+                dirLight.shadow.mapSize.width = 2048;
+                dirLight.shadow.mapSize.height = 2048;
+                dirLight.shadow.camera.far = 600;
+                dirLight.shadow.camera.left = -300;
+                dirLight.shadow.camera.right = 300;
+                dirLight.shadow.camera.top = 300;
+                dirLight.shadow.camera.bottom = -300;
+                this.scene.add(dirLight);
+
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+                this.scene.add(ambientLight);
+
+                const rimLight = new THREE.DirectionalLight(0x88ccff, 0.6);
+                rimLight.position.set(-150, 150, -150);
+                this.scene.add(rimLight);
+            }
+
+            setupEventListeners() {
+                window.addEventListener('keydown', (e) => this.onKeyDown(e));
+                window.addEventListener('keyup', (e) => this.onKeyUp(e));
+                window.addEventListener('click', (e) => this.onClick(e));
+            }
+
+            setupAchievements() {
+                this.achievements = [
+                    { id: 0, name: 'First Steps', desc: 'Begin your adventure', unlocked: false },
+                    { id: 1, name: 'Dragon Slayer', desc: 'Defeat a boss', unlocked: false },
+                    { id: 2, name: 'Gold Rush', desc: 'Collect 500 gold', unlocked: false },
+                    { id: 3, name: 'Explorer', desc: 'Visit all biomes', unlocked: false },
+                    { id: 4, name: 'Collector', desc: 'Find treasures', unlocked: false },
+                    { id: 5, name: 'Warrior', desc: 'Reach level 10', unlocked: false },
+                    { id: 6, name: 'Legendary', desc: 'Reach level 50', unlocked: false },
+                    { id: 7, name: 'Diplomat', desc: 'Talk to NPCs', unlocked: false },
+                    { id: 8, name: 'Survivor', desc: 'Complete story', unlocked: false },
+                    { id: 9, name: 'Master', desc: 'Complete all tasks', unlocked: false },
+                ];
+            }
+
+            onKeyDown(e) {
+                if (!this.player) return;
+                const key = e.key.toLowerCase();
+                if (key === 'w' || key === 'arrowup') this.player.moveForward = true;
+                if (key === 's' || key === 'arrowdown') this.player.moveBackward = true;
+                if (key === 'a' || key === 'arrowleft') this.player.moveLeft = true;
+                if (key === 'd' || key === 'arrowright') this.player.moveRight = true;
+                if (key === ' ') this.player.jump();
+                if (key === 'e') this.interactNearby();
+                if (key === 'escape') this.togglePause();
+                if (key === '1') this.player.equipWeapon(0);
+                if (key === '2') this.player.equipWeapon(1);
+                if (key === '3') this.player.equipWeapon(2);
+            }
+
+            onKeyUp(e) {
+                if (!this.player) return;
+                const key = e.key.toLowerCase();
+                if (key === 'w' || key === 'arrowup') this.player.moveForward = false;
+                if (key === 's' || key === 'arrowdown') this.player.moveBackward = false;
+                if (key === 'a' || key === 'arrowleft') this.player.moveLeft = false;
+                if (key === 'd' || key === 'arrowright') this.player.moveRight = false;
+            }
+
+            onClick(e) {
+                if (!this.player || !this.isPlaying) return;
+                if (e.button === 0) this.player.attack();
+            }
+
+            startGame() {
+                this.hideMenu('mainMenu');
+                this.gameState = 'playing';
+                this.isPlaying = true;
+                this.scene.clear();
+                this.createWorld();
+                this.createPlayer();
+                this.createNPCs();
+                this.createEnemies();
+                this.playerData.achievements.add(0);
+                this.updateHUD();
+            }
+
+            createWorld() {
+                // Terrain
+                const terrainGeometry = new THREE.PlaneGeometry(600, 600, 60, 60);
+                terrainGeometry.rotateX(-Math.PI / 2);
+
+                const positionAttribute = terrainGeometry.getAttribute('position');
+                const positionArray = positionAttribute.array;
+
+                for (let i = 0; i < positionArray.length; i += 3) {
+                    const x = positionArray[i];
+                    const z = positionArray[i + 2];
+                    positionArray[i + 1] = Math.sin(x * 0.01) * 15 + Math.cos(z * 0.01) * 15;
+                }
+                positionAttribute.needsUpdate = true;
+                terrainGeometry.computeVertexNormals();
+
+                const terrainMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x2d5016,
+                    roughness: 0.8,
+                    metalness: 0,
+                    flatShading: true
                 });
 
-                document.addEventListener('keyup', (e) => {
-                    this.keys[e.key.toLowerCase()] = false;
+                const terrain = new THREE.Mesh(terrainGeometry, terrainMaterial);
+                terrain.castShadow = true;
+                terrain.receiveShadow = true;
+                this.scene.add(terrain);
+
+                // Add trees
+                for (let i = 0; i < 40; i++) {
+                    const x = (Math.random() - 0.5) * 500;
+                    const z = (Math.random() - 0.5) * 500;
+                    this.createTree(x, 0, z);
+                }
+
+                // Add structures
+                this.createCastle(0, 0, 0);
+                this.createTower(200, 0, 200);
+                this.createTower(-200, 0, -200);
+                this.createRuins(0, 0, -200);
+            }
+
+            createTree(x, y, z) {
+                const trunkGeometry = new THREE.CylinderGeometry(6, 10, 40, 8);
+                const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x5c3d2e, roughness: 0.9 });
+                const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+                trunk.position.set(x, y + 20, z);
+                trunk.castShadow = true;
+                trunk.receiveShadow = true;
+                this.scene.add(trunk);
+
+                // Foliage
+                for (let i = 0; i < 3; i++) {
+                    const foliageGeometry = new THREE.IcosahedronGeometry(25 - i * 6, 4);
+                    const foliageMaterial = new THREE.MeshStandardMaterial({
+                        color: [0x1b5e20, 0x2e7d32, 0x43a047][i],
+                        roughness: 0.6,
+                        flatShading: true
+                    });
+                    const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
+                    foliage.position.set(x, y + 50 - i * 6, z);
+                    foliage.castShadow = true;
+                    foliage.receiveShadow = true;
+                    this.scene.add(foliage);
+                }
+            }
+
+            createCastle(x, y, z) {
+                const keepGeometry = new THREE.BoxGeometry(70, 100, 70);
+                const stoneMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x696969,
+                    roughness: 0.9,
+                    flatShading: true
                 });
+                const keep = new THREE.Mesh(keepGeometry, stoneMaterial);
+                keep.position.set(x, y + 50, z);
+                keep.castShadow = true;
+                keep.receiveShadow = true;
+                this.scene.add(keep);
+
+                // Corner towers
+                const corners = [[-35, 0, -35], [35, 0, -35], [-35, 0, 35], [35, 0, 35]];
+                for (const corner of corners) {
+                    const towerGeometry = new THREE.CylinderGeometry(14, 18, 120, 8);
+                    const tower = new THREE.Mesh(towerGeometry, stoneMaterial);
+                    tower.position.set(x + corner[0], y + 60, z + corner[2]);
+                    tower.castShadow = true;
+                    tower.receiveShadow = true;
+                    this.scene.add(tower);
+                }
+
+                // Gate
+                const gateGeometry = new THREE.BoxGeometry(50, 60, 6);
+                const gateMaterial = new THREE.MeshStandardMaterial({ color: 0x3d3d3d });
+                const gate = new THREE.Mesh(gateGeometry, gateMaterial);
+                gate.position.set(x, y + 30, z - 35);
+                gate.castShadow = true;
+                this.scene.add(gate);
             }
 
-            playGame() {
-                gameState.currentWorld = 1;
-                gameState.currentLevel = 1;
-                this.startLevel(gameState.currentWorld, gameState.currentLevel);
+            createTower(x, y, z) {
+                const towerGeometry = new THREE.CylinderGeometry(18, 25, 100, 8);
+                const stoneMaterial = new THREE.MeshStandardMaterial({ color: 0x696969, roughness: 0.9, flatShaping: true });
+                const tower = new THREE.Mesh(towerGeometry, stoneMaterial);
+                tower.position.set(x, y + 50, z);
+                tower.castShadow = true;
+                tower.receiveShadow = true;
+                this.scene.add(tower);
+
+                const roofGeometry = new THREE.ConeGeometry(22, 35, 8);
+                const roofMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+                const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+                roof.position.set(x, y + 125, z);
+                roof.castShadow = true;
+                this.scene.add(roof);
             }
 
-            showLevelSelect() {
-                document.getElementById('mainMenu').classList.add('hidden');
-                document.getElementById('levelSelect').classList.remove('hidden');
-                this.renderWorldSelect();
-            }
-
-            renderWorldSelect() {
-                const grid = document.getElementById('worldSelectGrid');
-                grid.innerHTML = '';
-                const worldNames = ['🔮 CRYSTAL CAVES', '❄️ ICE CAVERN', '🌋 LAVA REALM'];
-                for (let w = 1; w <= CONST.WORLDS; w++) {
-                    const btn = document.createElement('div');
-                    btn.className = 'world-card';
-                    btn.innerHTML = `<h3>${worldNames[w-1]}</h3>`;
-                    btn.onclick = () => this.selectWorld(w);
-                    grid.appendChild(btn);
+            createRuins(x, y, z) {
+                for (let i = 0; i < 6; i++) {
+                    const ruinGeometry = new THREE.BoxGeometry(20, 40, 20);
+                    const ruinMaterial = new THREE.MeshStandardMaterial({ color: 0x8B7355 });
+                    const ruin = new THREE.Mesh(ruinGeometry, ruinMaterial);
+                    ruin.position.set(x + i * 35, y + 20, z);
+                    ruin.castShadow = true;
+                    ruin.receiveShadow = true;
+                    this.scene.add(ruin);
                 }
             }
 
-            selectWorld(world) {
-                document.getElementById('levelSelect').classList.add('hidden');
-                document.getElementById('levelChooser').classList.remove('hidden');
-                this.renderLevelSelect(world);
+            createPlayer() {
+                this.player = new Player(this.scene, this.world, 0, 50, 0);
+                this.camera.position.set(0, 30, 50);
+                this.updateCamera();
             }
 
-            renderLevelSelect(world) {
-                const worldNames = ['🔮 CRYSTAL CAVES', '❄️ ICE CAVERN', '🌋 LAVA REALM'];
-                document.getElementById('worldTitle').textContent = `${worldNames[world-1]} - LEVELS`;
-                const grid = document.getElementById('levelGrid');
-                grid.innerHTML = '';
-                for (let l = 1; l <= CONST.LEVELS_PER_WORLD; l++) {
-                    const levelId = (world - 1) * 10 + l;
-                    const btn = document.createElement('button');
-                    btn.className = 'level-button';
-                    btn.textContent = l;
-                    if (playerProgress.completedLevels.has(levelId)) btn.classList.add('completed');
-                    btn.onclick = () => this.startLevel(world, l);
-                    grid.appendChild(btn);
+            createNPCs() {
+                const npcData = [
+                    { name: 'Elder Sage', x: 0, z: -100, dialogue: 'Welcome, brave adventurer! The land needs your help.' },
+                    { name: 'Blacksmith', x: 80, z: -80, dialogue: 'I can forge powerful weapons for you. Bring materials!' },
+                    { name: 'Merchant', x: -80, z: -80, dialogue: 'I have rare items to sell. Do you have gold?' }
+                ];
+
+                for (const data of npcData) {
+                    const npc = new NPC(this.scene, data.name, data.x, 5, data.z, data.dialogue);
+                    this.npcs.push(npc);
                 }
             }
 
-            startLevel(world, level) {
-                gameState.currentWorld = world;
-                gameState.currentLevel = level;
-                gameState.isPlaying = true;
-                gameState.isPaused = false;
-                document.getElementById('levelChooser').classList.add('hidden');
-                document.getElementById('mainMenu').classList.add('hidden');
-                document.getElementById('hud').classList.remove('hidden');
-
-                const levelGen = new LevelGenerator(world, level);
-                const levelData = levelGen.generate();
-                this.blocks = levelData.blocks;
-                this.hazards = levelData.hazards;
-                this.items = levelData.items;
-                this.checkpoint = levelData.checkpoint;
-                this.levelStart = levelData.start;
-                this.levelEnd = levelData.end;
-                this.backgroundRenderer = new BackgroundRenderer(world);
-
-                this.player = new Player(this.levelStart.x, this.levelStart.y);
-                if (this.checkpoint.length > 0) {
-                    this.player.checkpointX = this.checkpoint[0].x;
-                    this.player.checkpointY = this.checkpoint[0].y;
+            createEnemies() {
+                for (let i = 0; i < 6; i++) {
+                    const x = (Math.random() - 0.5) * 400;
+                    const z = (Math.random() - 0.5) * 400;
+                    if (Math.abs(x) < 120 && Math.abs(z) < 120) continue;
+                    const enemy = new Enemy(this.scene, x, 5, z, 'goblin');
+                    this.enemies.push(enemy);
                 }
+            }
 
-                document.getElementById('hudLevel').textContent = `${world}-${level}`;
-                document.getElementById('hudDeaths').textContent = '0';
-                document.getElementById('hudCoins').textContent = '0';
-                document.getElementById('hudCheckpoints').textContent = this.checkpoint.length;
+            interactNearby() {
+                if (!this.player) return;
+                for (const npc of this.npcs) {
+                    const dist = this.player.mesh.position.distanceTo(npc.mesh.position);
+                    if (dist < 40) {
+                        this.showDialogue(npc.name, npc.dialogue);
+                        this.playerData.achievements.add(7);
+                        return;
+                    }
+                }
+            }
+
+            showDialogue(name, text) {
+                document.getElementById('npcName').textContent = name;
+                document.getElementById('dialogueText').textContent = text;
+                document.getElementById('dialogueBox').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('dialogueBox').classList.add('hidden');
+                }, 5000);
+            }
+
+            updateCamera() {
+                if (!this.player) return;
+                const offset = new THREE.Vector3(0, 35, 60);
+                this.camera.position.lerp(this.player.mesh.position.clone().add(offset), 0.08);
+                this.camera.lookAt(this.player.mesh.position.clone().add(new THREE.Vector3(0, 15, 0)));
+            }
+
+            updateHUD() {
+                const healthPercent = (this.playerData.health / this.playerData.maxHealth) * 100;
+                document.getElementById('healthFill').style.width = healthPercent + '%';
+                document.getElementById('hudCoins').textContent = `💰 Gold: ${this.playerData.gold}`;
+                document.getElementById('hudLevel').textContent = `📍 Level: ${this.playerData.level}`;
+                const playtime = Math.floor(this.gameTime / 60);
+                document.getElementById('hudTime').textContent = `⏰ Time: ${playtime}:${String(Math.floor(this.gameTime % 60)).padStart(2, '0')}`;
+            }
+
+            showAchievements() {
+                const list = document.getElementById('achievementsList');
+                list.innerHTML = '';
+                for (const ach of this.achievements) {
+                    const item = document.createElement('div');
+                    item.className = 'achievement-item' + (this.playerData.achievements.has(ach.id) ? ' unlocked' : '');
+                    item.innerHTML = `
+                        <div>${this.playerData.achievements.has(ach.id) ? '🏆' : '🔒'}</div>
+                        <div style="font-size: 10px;">${ach.name}</div>
+                    `;
+                    list.appendChild(item);
+                }
+                this.showMenu('achievementsMenu');
+            }
+
+            showStats() {
+                const grid = document.getElementById('statsGrid');
+                grid.innerHTML = `
+                    <div class="stat-box">
+                        <div class="stat-value">${this.playerData.level}</div>
+                        <div class="stat-label">LEVEL</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">${Math.floor(this.playerData.experience)}</div>
+                        <div class="stat-label">EXP</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">${this.playerData.gold}</div>
+                        <div class="stat-label">GOLD</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">${this.playerData.deaths}</div>
+                        <div class="stat-label">DEATHS</div>
+                    </div>
+                `;
+                this.showMenu('statsMenu');
+            }
+
+            showSettings() {
+                alert('Settings: Volume, Graphics, Controls (coming soon)');
+            }
+
+            showMenu(menuId) {
+                document.getElementById(menuId).classList.remove('hidden');
+                document.getElementById(menuId).classList.add('visible');
+            }
+
+            hideMenu(menuId) {
+                document.getElementById(menuId).classList.add('hidden');
+                document.getElementById(menuId).classList.remove('visible');
+            }
+
+            backToMenu() {
+                this.hideMenu('achievementsMenu');
+                this.hideMenu('statsMenu');
+                this.showMenu('mainMenu');
+                this.isPlaying = false;
+                this.gameState = 'menu';
+            }
+
+            togglePause() {
+                this.isPaused = !this.isPaused;
+            }
+
+            onWindowResize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+
+            hideLoadingScreen() {
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').style.opacity = '0';
+                    document.getElementById('loadingScreen').style.pointerEvents = 'none';
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                    }, 500);
+                }, 800);
             }
 
             animate() {
                 requestAnimationFrame(() => this.animate());
 
-                if (!gameState.isPlaying || gameState.isPaused) return;
+                if (this.isPlaying && !this.isPaused) {
+                    this.gameTime += 0.016;
+                    this.world.step(1 / 60);
 
-                if (this.player) {
-                    this.items = this.player.update(this.keys, this.blocks, this.hazards, this.items);
+                    if (this.player) {
+                        this.player.update();
+                        this.updateCamera();
 
-                    for (let cp of this.checkpoint) {
-                        if (Math.abs(this.player.x - cp.x) < 40 && Math.abs(this.player.y - cp.y) < 40) {
-                            this.player.checkpointX = cp.x;
-                            this.player.checkpointY = cp.y;
-                            createParticles(cp.x, cp.y, 8, '#00ff00');
-                        }
-                    }
-
-                    if (Math.abs(this.player.x - this.levelEnd.x) < 50 && Math.abs(this.player.y - this.levelEnd.y) < 50) {
-                        this.completeLevel();
-                    }
-                }
-
-                this.render();
-                this.updateUI();
-            }
-
-            render() {
-                // Background
-                if (this.backgroundRenderer) {
-                    this.backgroundRenderer.draw(this.ctx);
-                }
-
-                // Blocks
-                for (let block of this.blocks) {
-                    drawBlock(this.ctx, block);
-                }
-
-                // Hazards
-                for (let hazard of this.hazards) {
-                    if (hazard.type === 'saw') {
-                        this.ctx.save();
-                        this.ctx.translate(hazard.x, hazard.y);
-                        this.ctx.rotate((Date.now() * 0.01) % (Math.PI * 2));
-                        this.ctx.fillStyle = '#FF0000';
-                        this.ctx.beginPath();
-                        this.ctx.arc(0, 0, hazard.radius, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        for (let i = 0; i < 8; i++) {
-                            const angle = (Math.PI * 2 * i) / 8;
-                            this.ctx.fillStyle = '#FF6B6B';
-                            this.ctx.fillRect(Math.cos(angle) * 15 - 2, Math.sin(angle) * 15 - 5, 4, 10);
-                        }
-                        this.ctx.restore();
-                    } else if (hazard.type === 'spike') {
-                        this.ctx.fillStyle = '#FF6B6B';
-                        this.ctx.fillRect(hazard.x, hazard.y, hazard.width, hazard.height);
-                        this.ctx.fillStyle = '#FF4444';
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(hazard.x + hazard.width / 2, hazard.y);
-                        this.ctx.lineTo(hazard.x + hazard.width, hazard.y + hazard.height);
-                        this.ctx.lineTo(hazard.x, hazard.y + hazard.height);
-                        this.ctx.closePath();
-                        this.ctx.fill();
-                    }
-                }
-
-                // Items
-                for (let item of this.items) {
-                    if (item.type === 'coin') {
-                        this.ctx.save();
-                        this.ctx.translate(item.x, item.y);
-                        this.ctx.rotate((Date.now() * 0.01) % (Math.PI * 2));
-                        this.ctx.fillStyle = '#FFD700';
-                        this.ctx.beginPath();
-                        this.ctx.arc(0, 0, 8, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        this.ctx.strokeStyle = '#FFA500';
-                        this.ctx.lineWidth = 2;
-                        this.ctx.stroke();
-                        if (item.sparkle) {
-                            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                            this.ctx.fillRect(-3, -3, 2, 2);
-                            this.ctx.fillRect(2, 1, 2, 2);
-                        }
-                        this.ctx.restore();
-                    }
-                }
-
-                // Checkpoints
-                for (let cp of this.checkpoint) {
-                    this.ctx.save();
-                    this.ctx.translate(cp.x, cp.y);
-                    this.ctx.rotate((Date.now() * 0.005) % (Math.PI * 2));
-                    this.ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
-                    this.ctx.fillRect(-20, -20, 40, 40);
-                    this.ctx.fillStyle = '#00FF00';
-                    this.ctx.font = 'bold 20px Arial';
-                    this.ctx.textAlign = 'center';
-                    this.ctx.textBaseline = 'middle';
-                    this.ctx.fillText('🚩', 0, 0);
-                    this.ctx.restore();
-                }
-
-                // End portal
-                this.ctx.save();
-                this.ctx.translate(this.levelEnd.x, this.levelEnd.y);
-                this.ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
-                this.ctx.beginPath();
-                this.ctx.arc(0, 0, 30 + Math.sin(Date.now() * 0.005) * 5, 0, Math.PI * 2);
-                this.ctx.fill();
-                this.ctx.fillStyle = '#FFD700';
-                this.ctx.font = 'bold 24px Arial';
-                this.ctx.textAlign = 'center';
-                this.ctx.textBaseline = 'middle';
-                this.ctx.fillText('🏁', 0, 0);
-                this.ctx.restore();
-
-                // Player
-                if (this.player) {
-                    this.player.draw(this.ctx);
-                }
-
-                // Particles
-                for (let particle of particles) {
-                    particle.update();
-                    particle.draw(this.ctx);
-                }
-                particles = particles.filter(p => p.life > 0);
-
-                if (gameState.debug) {
-                    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                    this.ctx.font = '12px Arial';
-                    this.ctx.fillText(`X: ${this.player.x.toFixed(0)} Y: ${this.player.y.toFixed(0)}`, 10, 30);
-                }
-            }
-
-            updateUI() {
-                document.getElementById('hudDeaths').textContent = this.player?.deaths || 0;
-                document.getElementById('hudCoins').textContent = playerProgress.coins;
-
-                const elapsed = Math.floor((Date.now() - (this.player?.levelStartTime || Date.now())) / 1000);
-                const mins = Math.floor(elapsed / 60);
-                const secs = elapsed % 60;
-                document.getElementById('hudTimer').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
-
-                document.getElementById('playerDisplay').textContent = `👤 ${playerProgress.username}`;
-                document.getElementById('statsDisplay').innerHTML = `💰 ${playerProgress.coins} | 🏆 ${playerProgress.achievements.size}/200`;
-                document.getElementById('shopCoins').textContent = playerProgress.coins;
-            }
-
-            completeLevel() {
-                gameState.isPlaying = false;
-                const levelId = (gameState.currentWorld - 1) * 10 + gameState.currentLevel;
-                playerProgress.completedLevels.add(levelId);
-                achievements.unlock(levelId - 1);
-                accountSystem.save();
-
-                const elapsed = Math.floor((Date.now() - this.player.levelStartTime) / 1000);
-                document.getElementById('finalTime').textContent = `${Math.floor(elapsed / 60)}:${(elapsed % 60).toString().padStart(2, '0')}`;
-                document.getElementById('finalDeaths').textContent = this.player.deaths;
-                document.getElementById('finalCoins').textContent = playerProgress.coins;
-
-                document.getElementById('levelComplete').classList.remove('hidden');
-                document.getElementById('hud').classList.add('hidden');
-                createParticles(this.levelEnd.x, this.levelEnd.y, 30, '#FFD700');
-            }
-
-            nextLevel() {
-                document.getElementById('levelComplete').classList.add('hidden');
-                if (gameState.currentLevel < CONST.LEVELS_PER_WORLD) {
-                    this.startLevel(gameState.currentWorld, gameState.currentLevel + 1);
-                } else if (gameState.currentWorld < CONST.WORLDS) {
-                    this.startLevel(gameState.currentWorld + 1, 1);
-                } else {
-                    this.goToMenu();
-                }
-            }
-
-            restartLevel() {
-                this.startLevel(gameState.currentWorld, gameState.currentLevel);
-            }
-
-            pause() {
-                gameState.isPaused = true;
-                document.getElementById('pauseMenu').classList.remove('hidden');
-            }
-
-            resume() {
-                gameState.isPaused = false;
-                document.getElementById('pauseMenu').classList.add('hidden');
-            }
-
-            goToMenu() {
-                gameState.isPlaying = false;
-                gameState.isPaused = false;
-                document.getElementById('levelComplete').classList.add('hidden');
-                document.getElementById('pauseMenu').classList.add('hidden');
-                document.getElementById('hud').classList.add('hidden');
-                document.getElementById('mainMenu').classList.remove('hidden');
-                document.getElementById('levelSelect').classList.add('hidden');
-                document.getElementById('levelChooser').classList.add('hidden');
-            }
-
-            showShop() {
-                document.getElementById('mainMenu').classList.add('hidden');
-                document.getElementById('shopMenu').classList.remove('hidden');
-                this.renderShop();
-            }
-
-            renderShop() {
-                const grid = document.getElementById('shopGrid');
-                grid.innerHTML = '';
-                for (let skin of shopSystem.skins) {
-                    const item = document.createElement('div');
-                    item.className = 'level-button';
-                    if (playerProgress.skins.has(skin.id)) {
-                        item.style.background = skin.color;
-                        item.style.opacity = '1';
-                        item.textContent = '✓ OWNED';
-                    } else {
-                        item.style.background = skin.color;
-                        item.style.opacity = '0.6';
-                        item.textContent = `💰${skin.price}`;
-                        item.onclick = () => {
-                            const msg = shopSystem.buySkin(skin.id);
-                            if (msg.includes('purchased')) {
-                                this.renderShop();
-                                this.updateUI();
-                            } else {
-                                alert(msg);
+                        // Check enemy collisions
+                        for (const enemy of this.enemies) {
+                            enemy.update(this.player);
+                            const dist = this.player.mesh.position.distanceTo(enemy.mesh.position);
+                            if (dist < 20) {
+                                this.playerData.health -= 0.5;
                             }
-                        };
+                        }
+
+                        if (this.playerData.health <= 0) {
+                            this.playerData.deaths++;
+                            this.playerData.health = 100;
+                            this.player.mesh.position.set(0, 50, 0);
+                        }
                     }
-                    grid.appendChild(item);
-                }
-            }
 
-            showAccount() {
-                document.getElementById('mainMenu').classList.add('hidden');
-                document.getElementById('accountMenu').classList.remove('hidden');
-                const content = document.getElementById('accountContent');
-
-                if (playerProgress.isLoggedIn) {
-                    content.innerHTML = `
-                        <div class="level-stats">
-                            <p>👤 ${playerProgress.username}</p>
-                            <p>💰 ${playerProgress.coins}</p>
-                            <p>🏆 ${playerProgress.achievements.size}/200</p>
-                        </div>
-                        <button class="menu-button" onclick="game.logout()">LOGOUT</button>
-                    `;
-                } else {
-                    content.innerHTML = `
-                        <input type="text" id="authUsername" placeholder="Username" style="padding: 10px; width: 100%; margin: 10px 0; border-radius: 5px; border: none;">
-                        <input type="password" id="authPassword" placeholder="Password" style="padding: 10px; width: 100%; margin: 10px 0; border-radius: 5px; border: none;">
-                        <button class="menu-button" onclick="game.loginAccount()">LOGIN</button>
-                        <button class="menu-button" onclick="game.registerAccount()">REGISTER</button>
-                        <button class="menu-button" onclick="game.goToMenu()">GUEST MODE</button>
-                    `;
-                }
-            }
-
-            loginAccount() {
-                const username = document.getElementById('authUsername').value;
-                const password = document.getElementById('authPassword').value;
-                if (!username || !password) {
-                    alert('Please enter username and password');
-                    return;
-                }
-                const msg = accountSystem.login(username, password);
-                alert(msg);
-                this.showAccount();
-            }
-
-            registerAccount() {
-                const username = document.getElementById('authUsername').value;
-                const password = document.getElementById('authPassword').value;
-                if (!username || !password) {
-                    alert('Please enter username and password');
-                    return;
-                }
-                const msg = accountSystem.register(username, password);
-                alert(msg);
-            }
-
-            logout() {
-                accountSystem.logout();
-                playerProgress.isLoggedIn = false;
-                playerProgress.username = 'Guest';
-                this.showAccount();
-            }
-
-            showTutorial() {
-                document.getElementById('mainMenu').classList.add('hidden');
-                document.getElementById('tutorialMenu').classList.remove('hidden');
-            }
-
-            showSettings() {
-                document.getElementById('mainMenu').classList.add('hidden');
-                document.getElementById('settingsMenu').classList.remove('hidden');
-
-                document.getElementById('soundToggle').onchange = (e) => {
-                    gameState.soundOn = e.target.checked;
-                };
-                document.getElementById('musicToggle').onchange = (e) => {
-                    gameState.musicOn = e.target.checked;
-                };
-                document.getElementById('volumeSlider').onchange = (e) => {
-                    gameState.volume = e.target.value;
-                };
-            }
-
-            showAchievements() {
-                document.getElementById('pauseMenu').classList.add('hidden');
-                document.getElementById('achievementsMenu').classList.remove('hidden');
-
-                const list = document.getElementById('achievementsList');
-                list.innerHTML = '';
-
-                for (let ach of achievements.list) {
-                    const item = document.createElement('div');
-                    item.className = 'achievement-item';
-                    const unlocked = playerProgress.achievements.has(ach.id);
-                    if (unlocked) {
-                        item.classList.add('unlocked');
-                        item.innerHTML = `<h3>🏆</h3><p>${ach.title}</p><p style="font-size: 12px;">+${ach.reward}</p>`;
-                    } else {
-                        item.classList.add('locked');
-                        item.innerHTML = `<h3>🔒</h3><p>???</p><p style="font-size: 12px;">?</p>`;
-                    }
-                    list.appendChild(item);
+                    this.updateHUD();
                 }
 
-                document.getElementById('achievementStats').innerHTML = `
-                    <p>🏆 ${playerProgress.achievements.size} / ${achievements.list.length}</p>
-                `;
-            }
-
-            closeAchievements() {
-                document.getElementById('achievementsMenu').classList.add('hidden');
-                document.getElementById('pauseMenu').classList.remove('hidden');
+                this.renderer.render(this.scene, this.camera);
             }
         }
 
-        // Initialize game
+        // ==================== PLAYER CLASS ====================
+        class Player {
+            constructor(scene, world, x, y, z) {
+                this.scene = scene;
+                this.world = world;
+                this.health = 100;
+                this.speed = 1;
+                this.moveForward = false;
+                this.moveBackward = false;
+                this.moveLeft = false;
+                this.moveRight = false;
+                this.isGrounded = false;
+                this.currentWeapon = 0;
+
+                const geometry = new THREE.CapsuleGeometry(5, 20, 4, 8);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0xff6b6b,
+                    roughness: 0.6,
+                    metalness: 0.2,
+                    flatShading: true
+                });
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.position.set(x, y, z);
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+                scene.add(this.mesh);
+
+                const shape = new CANNON.Sphere(5);
+                this.body = new CANNON.Body({ mass: 1 });
+                this.body.addShape(shape);
+                this.body.position.set(x, y, z);
+                world.addBody(this.body);
+
+                this.addWeapon('sword');
+            }
+
+            addWeapon(type) {
+                if (type === 'sword') {
+                    const swordGeometry = new THREE.BoxGeometry(3, 30, 1);
+                    const swordMaterial = new THREE.MeshStandardMaterial({ color: 0xffaa00, metalness: 0.9 });
+                    const sword = new THREE.Mesh(swordGeometry, swordMaterial);
+                    sword.position.set(8, 0, 0);
+                    sword.castShadow = true;
+                    this.mesh.add(sword);
+                }
+            }
+
+            update() {
+                const direction = new THREE.Vector3();
+                if (this.moveForward) direction.z -= 1;
+                if (this.moveBackward) direction.z += 1;
+                if (this.moveLeft) direction.x -= 1;
+                if (this.moveRight) direction.x += 1;
+
+                if (direction.length() > 0) {
+                    direction.normalize().multiplyScalar(this.speed);
+                    this.body.velocity.x = direction.x * 15;
+                    this.body.velocity.z = direction.z * 15;
+
+                    this.mesh.lookAt(
+                        this.mesh.position.clone().add(direction)
+                    );
+                }
+
+                this.mesh.position.copy(this.body.position);
+                this.mesh.quaternion.copy(this.body.quaternion);
+            }
+
+            jump() {
+                if (this.isGrounded) {
+                    this.body.velocity.y = 20;
+                    this.isGrounded = false;
+                }
+            }
+
+            attack() {
+                console.log('Attack with weapon');
+            }
+
+            equipWeapon(index) {
+                this.currentWeapon = index;
+            }
+        }
+
+        // ==================== NPC CLASS ====================
+        class NPC {
+            constructor(scene, name, x, y, z, dialogue) {
+                this.name = name;
+                this.dialogue = dialogue;
+
+                const geometry = new THREE.CapsuleGeometry(4, 16, 4, 8);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0x4ecdc4,
+                    roughness: 0.6,
+                    flatShading: true
+                });
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.position.set(x, y, z);
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+                scene.add(this.mesh);
+
+                const headGeometry = new THREE.SphereGeometry(5, 8, 8);
+                const head = new THREE.Mesh(headGeometry, material);
+                head.position.y = 14;
+                head.castShadow = true;
+                this.mesh.add(head);
+            }
+        }
+
+        // ==================== ENEMY CLASS ====================
+        class Enemy {
+            constructor(scene, x, y, z, type) {
+                this.type = type;
+                this.health = 30;
+                this.speed = 0.6;
+                this.detectionRange = 150;
+
+                const geometry = new THREE.CapsuleGeometry(4, 16, 4, 8);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0xff4444,
+                    roughness: 0.6,
+                    flatShading: true
+                });
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.position.set(x, y, z);
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+                scene.add(this.mesh);
+            }
+
+            update(player) {
+                if (!player) return;
+
+                const distance = this.mesh.position.distanceTo(player.mesh.position);
+
+                if (distance < this.detectionRange) {
+                    const direction = player.mesh.position.clone().sub(this.mesh.position).normalize();
+                    this.mesh.position.addScaledVector(direction, this.speed);
+                    this.mesh.lookAt(player.mesh.position);
+                }
+            }
+        }
+
+        // ==================== INITIALIZE GAME ====================
         const game = new Game();
     </script>
 </body>

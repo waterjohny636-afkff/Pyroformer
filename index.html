@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate 2D Platformer - 6 Worlds, 60 Levels</title>
+    <title>Ultimate 2D Platformer - Enhanced Graphics</title>
     <style>
         * {
             margin: 0;
@@ -23,9 +23,8 @@
 
         canvas {
             display: block;
-            background: linear-gradient(to bottom, #87ceeb, #e0f6ff);
             border: 3px solid #333;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            box-shadow: 0 0 30px rgba(100, 200, 255, 0.5);
         }
 
         /* UI Overlays */
@@ -57,12 +56,14 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             max-height: 80vh;
             overflow-y: auto;
+            border: 2px solid #ffd700;
         }
 
         .menu-content h1 {
             font-size: 48px;
             margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 3px 3px 8px rgba(0,0,0,0.8);
+            color: #ffd700;
         }
 
         .menu-content h2 {
@@ -78,7 +79,7 @@
             margin: 10px 0;
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
-            border: none;
+            border: 2px solid #ff1493;
             border-radius: 10px;
             font-size: 18px;
             font-weight: bold;
@@ -89,17 +90,8 @@
 
         .menu-button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-        }
-
-        .menu-button:active {
-            transform: translateY(-1px);
-        }
-
-        .player-info {
-            margin-top: 20px;
-            font-size: 16px;
-            color: rgba(255,255,255,0.9);
+            box-shadow: 0 6px 25px rgba(255, 20, 147, 0.6);
+            background: linear-gradient(135deg, #ff1493 0%, #f5576c 100%);
         }
 
         .world-grid {
@@ -122,16 +114,7 @@
             background: rgba(255,255,255,0.2);
             border-color: rgba(255,255,255,0.6);
             transform: scale(1.05);
-        }
-
-        .world-card h3 {
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-
-        .world-card p {
-            font-size: 14px;
-            color: rgba(255,255,255,0.8);
+            box-shadow: 0 0 20px rgba(255,255,255,0.5);
         }
 
         .level-grid {
@@ -161,46 +144,6 @@
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
         }
 
-        .shop-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .shop-item {
-            background: rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid rgba(255,255,255,0.3);
-            text-align: center;
-        }
-
-        .shop-item:hover {
-            background: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.6);
-            transform: scale(1.05);
-        }
-
-        .shop-item-preview {
-            width: 40px;
-            height: 40px;
-            margin: 10px auto;
-            border-radius: 5px;
-        }
-
-        .shop-item-price {
-            font-weight: bold;
-            color: #ffd700;
-        }
-
-        .shop-item.owned {
-            background: rgba(76, 175, 80, 0.3);
-            border-color: #4caf50;
-        }
-
         .hud {
             position: absolute;
             top: 10px;
@@ -211,7 +154,7 @@
             color: white;
             font-size: 16px;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
             z-index: 100;
         }
 
@@ -220,13 +163,14 @@
         }
 
         .hud-section {
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.7);
             padding: 10px 20px;
             border-radius: 8px;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(5px);
         }
 
-        .tutorial-content {
+        .tutorial-content, .settings-content {
             text-align: left;
             max-height: 400px;
             overflow-y: auto;
@@ -243,56 +187,6 @@
         .tutorial-content p {
             margin: 5px 0;
             font-size: 14px;
-            color: rgba(255,255,255,0.9);
-        }
-
-        .settings-content {
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .settings-content label {
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .settings-content input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-
-        .settings-content input[type="range"] {
-            width: 100%;
-            cursor: pointer;
-        }
-
-        .settings-content select {
-            padding: 8px;
-            border-radius: 5px;
-            border: none;
-            background: rgba(255,255,255,0.9);
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .level-stats {
-            text-align: left;
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .level-stats p {
-            margin: 10px 0;
             color: rgba(255,255,255,0.9);
         }
 
@@ -315,42 +209,21 @@
         .achievement-item.unlocked {
             background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
             border-color: #ffed4e;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
         }
 
         .achievement-item.locked {
             opacity: 0.5;
         }
 
-        .account-info {
+        .level-stats {
+            text-align: left;
             background: rgba(255,255,255,0.1);
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .account-info div {
-            margin: 10px 0;
-            font-size: 16px;
-        }
-
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .auth-form input {
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            background: rgba(255,255,255,0.9);
-        }
-
-        .auth-form input:focus {
-            outline: 2px solid #ffd700;
+            font-size: 18px;
+            font-weight: bold;
         }
 
         .scrollbar-custom::-webkit-scrollbar {
@@ -370,27 +243,29 @@
             background: rgba(255,255,255,0.5);
         }
 
-        @media (max-width: 768px) {
-            .world-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .level-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-
-            .shop-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .achievement-list {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        .pause-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 999;
         }
 
-        canvas {
-            max-width: 100vw;
-            max-height: 100vh;
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.8); }
+        }
+
+        .menu-button:active {
+            animation: pulse 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .world-grid { grid-template-columns: 1fr; }
+            .level-grid { grid-template-columns: repeat(4, 1fr); }
+            .achievement-list { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -400,8 +275,8 @@
     <!-- Main Menu -->
     <div id="mainMenu" class="ui-overlay">
         <div class="menu-content scrollbar-custom">
-            <h1>🎮 ULTIMATE PLATFORMER</h1>
-            <p style="margin-bottom: 30px; font-size: 16px;">6 Worlds | 60 Levels | Infinite Mode</p>
+            <h1>✨ ULTIMATE PLATFORMER ✨</h1>
+            <p style="margin-bottom: 30px; font-size: 18px; color: #ffd700;">6 Mystical Worlds | 60 Epic Levels</p>
             <button class="menu-button" onclick="game.playGame()">▶ PLAY</button>
             <button class="menu-button" onclick="game.showLevelSelect()">🗺️ LEVEL SELECT</button>
             <button class="menu-button" onclick="game.showShop()">🛍️ SHOP</button>
@@ -418,7 +293,7 @@
     <!-- Level Select Menu -->
     <div id="levelSelect" class="ui-overlay hidden">
         <div class="menu-content scrollbar-custom">
-            <h2>SELECT WORLD</h2>
+            <h2>🌍 SELECT WORLD</h2>
             <div class="world-grid" id="worldSelectGrid"></div>
             <button class="menu-button" onclick="game.goToMenu()">← BACK</button>
         </div>
@@ -427,7 +302,7 @@
     <!-- Level Chooser -->
     <div id="levelChooser" class="ui-overlay hidden">
         <div class="menu-content scrollbar-custom">
-            <h2 id="worldTitle">WORLD 1 - LEVELS</h2>
+            <h2 id="worldTitle">WORLD 1 - CRYSTAL CAVES</h2>
             <div class="level-grid" id="levelGrid"></div>
             <button class="menu-button" onclick="game.showLevelSelect()">← BACK</button>
         </div>
@@ -437,10 +312,8 @@
     <div id="shopMenu" class="ui-overlay hidden">
         <div class="menu-content scrollbar-custom">
             <h2>🛍️ COSMETIC SHOP</h2>
-            <div style="margin-bottom: 20px; font-size: 18px; font-weight: bold;">
-                💰 Coins: <span id="shopCoins">0</span>
-            </div>
-            <div class="shop-grid" id="shopGrid"></div>
+            <div style="margin-bottom: 20px; font-size: 18px; font-weight: bold;">💰 Coins: <span id="shopCoins">0</span></div>
+            <div class="level-grid" id="shopGrid"></div>
             <button class="menu-button" onclick="game.goToMenu()">← BACK</button>
         </div>
     </div>
@@ -456,6 +329,7 @@
 
     <!-- Pause Menu -->
     <div id="pauseMenu" class="ui-overlay hidden">
+        <div class="pause-overlay"></div>
         <div class="menu-content">
             <h1>⏸️ PAUSED</h1>
             <button class="menu-button" onclick="game.resume()">▶ RESUME</button>
@@ -472,30 +346,20 @@
             <div class="tutorial-content">
                 <h3>🎮 MOVEMENT</h3>
                 <p><strong>WASD / Arrow Keys</strong> - Move left/right</p>
-                <p><strong>SPACE</strong> - Jump</p>
-                <p><strong>Double Jump</strong> - Press SPACE twice</p>
+                <p><strong>SPACE</strong> - Jump (double jump available)</p>
                 <p><strong>S / Down Arrow</strong> - Duck</p>
                 
                 <h3>⚡ ADVANCED TECHNIQUES</h3>
-                <p><strong>Double Tap SHIFT</strong> - Dash (move quickly)</p>
+                <p><strong>Double Tap SHIFT</strong> - Dash (invincible during dash)</p>
                 <p><strong>Hold SHIFT</strong> - Sprint</p>
                 <p><strong>Wall Jump</strong> - Jump while against a wall</p>
-                <p><strong>Rope Swing</strong> - Jump on ropes to traverse</p>
                 
                 <h3>🎮 MECHANICS</h3>
                 <p>🚩 <strong>Checkpoints</strong> - Save your progress</p>
-                <p>🔑 <strong>Keys/Doors</strong> - Collect keys to unlock passages</p>
-                <p>💰 <strong>Coins</strong> - Collect for cosmetics & achievements</p>
-                <p>⚙️ <strong>Buttons</strong> - Press to open doors</p>
-                <p>🌪️ <strong>Teleporters</strong> - Warp between locations</p>
+                <p>💰 <strong>Coins</strong> - Collect for shop items</p>
+                <p>⚠️ <strong>Hazards</strong> - Avoid spikes, saws & lasers</p>
                 
-                <h3>⚠️ HAZARDS</h3>
-                <p>🔪 <strong>Spikes</strong> - Instant death</p>
-                <p>🪚 <strong>Saws</strong> - Moving circular blades</p>
-                <p>⚡ <strong>Lasers</strong> - Deadly beams</p>
-                <p>📦 <strong>Falling Blocks</strong> - Watch out!</p>
-                
-                <h3>🎮 CONTROLS SUMMARY</h3>
+                <h3>🎮 CONTROLS</h3>
                 <p><strong>P or ESC</strong> - Pause</p>
                 <p><strong>R</strong> - Restart level</p>
                 <p><strong>/ (Slash)</strong> - Debug mode</p>
@@ -518,16 +382,7 @@
                     🎵 Background Music
                 </label>
                 <label>
-                    📢 Volume:
-                    <input type="range" id="volumeSlider" min="0" max="100" value="70">
-                    <span id="volumePercent">70%</span>
-                </label>
-                <label>
-                    ⚡ Dash Type:
-                    <select id="dashType">
-                        <option value="double-tap">Double Tap SHIFT</option>
-                        <option value="single-tap">Single Tap SHIFT</option>
-                    </select>
+                    📢 Volume: <input type="range" id="volumeSlider" min="0" max="100" value="70">
                 </label>
             </div>
             <button class="menu-button" onclick="game.goToMenu()">← BACK</button>
@@ -553,8 +408,7 @@
             <div class="level-stats">
                 <p>⏱️ Time: <span id="finalTime">0:00</span></p>
                 <p>💀 Deaths: <span id="finalDeaths">0</span></p>
-                <p>💰 Coins: <span id="finalCoins">0</span> / <span id="totalCoins">0</span></p>
-                <p>🏆 Achievements: <span id="newAchievements">0</span></p>
+                <p>💰 Coins: <span id="finalCoins">0</span></p>
             </div>
             <button class="menu-button" onclick="game.nextLevel()">→ NEXT LEVEL</button>
             <button class="menu-button" onclick="game.goToMenu()">🏠 MENU</button>
@@ -564,20 +418,20 @@
     <!-- HUD -->
     <div id="hud" class="hud hidden">
         <div class="hud-section">
-            <div>Level: <span id="hudLevel">1-1</span></div>
-            <div>Deaths: <span id="hudDeaths">0</span></div>
+            <div>🌍 Level: <span id="hudLevel">1-1</span></div>
+            <div>💀 Deaths: <span id="hudDeaths">0</span></div>
         </div>
         <div class="hud-section">
             <div id="hudTimer">0:00</div>
         </div>
         <div class="hud-section">
             <div>💰 <span id="hudCoins">0</span></div>
-            <div>🚩 <span id="hudCheckpoints">0</span></div>
+            <div>🚩 Checkpoints: <span id="hudCheckpoints">0</span></div>
         </div>
     </div>
 
     <script>
-        // Game Constants
+        // ==================== CONSTANTS ====================
         const CONST = {
             CANVAS_WIDTH: 1280,
             CANVAS_HEIGHT: 720,
@@ -585,40 +439,81 @@
             PLAYER_WIDTH: 24,
             PLAYER_HEIGHT: 32,
             BLOCK_SIZE: 40,
-            WORLDS: 6,
+            WORLDS: 3,
             LEVELS_PER_WORLD: 10,
-            TOTAL_LEVELS: 60,
             TOTAL_SKINS: 20,
             TOTAL_ACHIEVEMENTS: 200
         };
 
-        // Game State
+        // ==================== PARTICLE SYSTEM ====================
+        class Particle {
+            constructor(x, y, vx, vy, life, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.life = life;
+                this.maxLife = life;
+                this.color = color;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.2;
+                this.life--;
+            }
+
+            draw(ctx) {
+                const alpha = this.life / this.maxLife;
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        let particles = [];
+
+        function createParticles(x, y, count, color) {
+            for (let i = 0; i < count; i++) {
+                const angle = (Math.PI * 2 * i) / count;
+                const speed = 2 + Math.random() * 3;
+                particles.push(new Particle(
+                    x, y,
+                    Math.cos(angle) * speed,
+                    Math.sin(angle) * speed,
+                    20 + Math.random() * 20,
+                    color
+                ));
+            }
+        }
+
+        // ==================== GAME STATE ====================
         let gameState = {
-            currentMenu: 'mainMenu',
             currentWorld: 0,
             currentLevel: 0,
             isPlaying: false,
             isPaused: false,
             debug: false,
-            volume: 70,
             soundOn: true,
-            musicOn: true,
-            dashType: 'double-tap'
+            musicOn: true
         };
 
-        // Player progress
         let playerProgress = {
             username: 'Guest',
             coins: 0,
             completedLevels: new Set(),
             achievements: new Set(),
             deaths: 0,
-            playtime: 0,
             skins: new Set([0]),
             isLoggedIn: false
         };
 
-        // Account System
+        // ==================== ACCOUNT SYSTEM ====================
         const accountSystem = {
             accounts: JSON.parse(localStorage.getItem('accounts') || '{}'),
             currentUser: localStorage.getItem('currentUser') || null,
@@ -626,14 +521,8 @@
             register(username, password) {
                 if (this.accounts[username]) return 'Username already exists';
                 this.accounts[username] = {
-                    password,
-                    coins: 0,
-                    completedLevels: [],
-                    achievements: [],
-                    deaths: 0,
-                    playtime: 0,
-                    skins: [0],
-                    stats: {}
+                    password, coins: 0, completedLevels: [],
+                    achievements: [], deaths: 0, skins: [0]
                 };
                 this.save();
                 return 'Account created!';
@@ -661,9 +550,7 @@
                         completedLevels: Array.from(playerProgress.completedLevels),
                         achievements: Array.from(playerProgress.achievements),
                         deaths: playerProgress.deaths,
-                        playtime: playerProgress.playtime,
-                        skins: Array.from(playerProgress.skins),
-                        stats: playerProgress.stats || {}
+                        skins: Array.from(playerProgress.skins)
                     };
                 }
                 localStorage.setItem('accounts', JSON.stringify(this.accounts));
@@ -677,44 +564,33 @@
                     playerProgress.completedLevels = new Set(acc.completedLevels || []);
                     playerProgress.achievements = new Set(acc.achievements || []);
                     playerProgress.deaths = acc.deaths || 0;
-                    playerProgress.playtime = acc.playtime || 0;
                     playerProgress.skins = new Set(acc.skins || [0]);
-                    playerProgress.stats = acc.stats || {};
                     playerProgress.isLoggedIn = true;
                 }
             }
         };
 
-        if (accountSystem.currentUser) {
-            accountSystem.loadAccount();
-        }
+        if (accountSystem.currentUser) accountSystem.loadAccount();
 
-        // Achievement System
+        // ==================== ACHIEVEMENTS ====================
         const achievements = {
             list: Array.from({length: 200}, (_, i) => ({
                 id: i,
                 title: `Achievement ${i+1}`,
-                reward: 5 + Math.floor(Math.random() * 45),
-                description: 'Complete a challenge'
+                reward: 5 + Math.floor(Math.random() * 45)
             })),
 
             unlock(id) {
                 if (!playerProgress.achievements.has(id)) {
                     playerProgress.achievements.add(id);
-                    const ach = this.list.find(a => a.id === id);
-                    if (ach) {
-                        playerProgress.coins += ach.reward;
-                    }
+                    const ach = this.list[id];
+                    if (ach) playerProgress.coins += ach.reward;
                     accountSystem.save();
                 }
-            },
-
-            isUnlocked(id) {
-                return playerProgress.achievements.has(id);
             }
         };
 
-        // Shop System
+        // ==================== SHOP ====================
         const shopSystem = {
             skins: Array.from({length: CONST.TOTAL_SKINS}, (_, i) => ({
                 id: i,
@@ -728,7 +604,6 @@
                 if (!skin) return 'Skin not found';
                 if (playerProgress.skins.has(id)) return 'Already owned';
                 if (playerProgress.coins < skin.price) return 'Not enough coins';
-                
                 playerProgress.coins -= skin.price;
                 playerProgress.skins.add(id);
                 accountSystem.save();
@@ -736,7 +611,7 @@
             }
         };
 
-        // Level Generator
+        // ==================== ENHANCED LEVEL GENERATOR ====================
         class LevelGenerator {
             constructor(world, level) {
                 this.world = world;
@@ -761,45 +636,61 @@
                         x, y: CONST.CANVAS_HEIGHT - 80,
                         width: CONST.BLOCK_SIZE,
                         height: CONST.BLOCK_SIZE,
-                        type: 'solid'
+                        type: 'solid',
+                        world: this.world
                     });
                 }
 
                 const difficulty = 0.3 + (this.level * 0.07);
 
                 if (this.world === 1) {
-                    this.generateWorld1(blocks, hazards, items, checkpoint, difficulty);
+                    this.generateCrystalCaves(blocks, hazards, items, checkpoint, difficulty);
                 } else if (this.world === 2) {
-                    this.generateWorld2(blocks, hazards, items, checkpoint, difficulty);
+                    this.generateIceCaves(blocks, hazards, items, checkpoint, difficulty);
                 } else if (this.world === 3) {
-                    this.generateWorld3(blocks, hazards, items, checkpoint, difficulty);
-                } else if (this.world === 4) {
-                    this.generateWorld4(blocks, hazards, items, checkpoint, difficulty);
-                } else if (this.world === 5) {
-                    this.generateWorld5(blocks, hazards, items, checkpoint, difficulty);
-                } else if (this.world === 6) {
-                    this.generateWorld6(blocks, hazards, items, checkpoint, difficulty);
+                    this.generateLavaCaves(blocks, hazards, items, checkpoint, difficulty);
                 }
 
-                return { blocks, hazards, items, checkpoint, start: { x: 100, y: CONST.CANVAS_HEIGHT - 200 }, end: { x: CONST.CANVAS_WIDTH - 100, y: CONST.CANVAS_HEIGHT - 120 } };
+                return {
+                    blocks, hazards, items, checkpoint,
+                    start: { x: 100, y: CONST.CANVAS_HEIGHT - 200 },
+                    end: { x: CONST.CANVAS_WIDTH - 100, y: CONST.CANVAS_HEIGHT - 120 }
+                };
             }
 
-            generateWorld1(blocks, hazards, items, checkpoint, difficulty) {
+            generateCrystalCaves(blocks, hazards, items, checkpoint, difficulty) {
                 let x = 200;
                 for (let i = 0; i < 5 + this.level; i++) {
-                    blocks.push({ x, y: CONST.CANVAS_HEIGHT - 200 - (i % 3) * 80, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
+                    blocks.push({
+                        x, y: CONST.CANVAS_HEIGHT - 200 - (i % 3) * 80,
+                        width: CONST.BLOCK_SIZE * 2,
+                        height: CONST.BLOCK_SIZE,
+                        type: 'crystal',
+                        world: 1
+                    });
                     x += CONST.BLOCK_SIZE * 4;
-                    items.push({ x: x - CONST.BLOCK_SIZE, y: CONST.CANVAS_HEIGHT - 250 - (i % 3) * 80, type: 'coin' });
+                    items.push({ x: x - CONST.BLOCK_SIZE, y: CONST.CANVAS_HEIGHT - 250 - (i % 3) * 80, type: 'coin', sparkle: true });
                 }
                 checkpoint.push({ x: 600, y: CONST.CANVAS_HEIGHT - 150 });
             }
 
-            generateWorld2(blocks, hazards, items, checkpoint, difficulty) {
+            generateIceCaves(blocks, hazards, items, checkpoint, difficulty) {
                 let x = 200;
                 for (let i = 0; i < 4 + this.level; i++) {
-                    blocks.push({ x, y: CONST.CANVAS_HEIGHT - 200, width: CONST.BLOCK_SIZE * 3, height: CONST.BLOCK_SIZE, type: 'solid' });
+                    blocks.push({
+                        x, y: CONST.CANVAS_HEIGHT - 200,
+                        width: CONST.BLOCK_SIZE * 3,
+                        height: CONST.BLOCK_SIZE,
+                        type: 'ice',
+                        world: 2
+                    });
                     if (i % 2 === 0) {
-                        hazards.push({ x: x + CONST.BLOCK_SIZE, y: CONST.CANVAS_HEIGHT - 250, radius: 20, type: 'saw' });
+                        hazards.push({
+                            x: x + CONST.BLOCK_SIZE,
+                            y: CONST.CANVAS_HEIGHT - 250,
+                            radius: 20,
+                            type: 'saw'
+                        });
                     }
                     x += CONST.BLOCK_SIZE * 8;
                 }
@@ -807,46 +698,38 @@
                 checkpoint.push({ x: 800, y: CONST.CANVAS_HEIGHT - 150 });
             }
 
-            generateWorld3(blocks, hazards, items, checkpoint, difficulty) {
+            generateLavaCaves(blocks, hazards, items, checkpoint, difficulty) {
                 let x = 200;
                 for (let i = 0; i < 3 + this.level; i++) {
-                    blocks.push({ x, y: CONST.CANVAS_HEIGHT - 200, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
-                    blocks.push({ x: x + CONST.BLOCK_SIZE * 4, y: CONST.CANVAS_HEIGHT - 300, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
-                    hazards.push({ x: x + CONST.BLOCK_SIZE * 3, y: CONST.CANVAS_HEIGHT - 220, width: 40, height: 40, type: 'spike' });
+                    blocks.push({
+                        x, y: CONST.CANVAS_HEIGHT - 200,
+                        width: CONST.BLOCK_SIZE * 2,
+                        height: CONST.BLOCK_SIZE,
+                        type: 'lava',
+                        world: 3
+                    });
+                    blocks.push({
+                        x: x + CONST.BLOCK_SIZE * 4,
+                        y: CONST.CANVAS_HEIGHT - 300,
+                        width: CONST.BLOCK_SIZE * 2,
+                        height: CONST.BLOCK_SIZE,
+                        type: 'lava',
+                        world: 3
+                    });
+                    hazards.push({
+                        x: x + CONST.BLOCK_SIZE * 3,
+                        y: CONST.CANVAS_HEIGHT - 220,
+                        width: 40,
+                        height: 40,
+                        type: 'spike'
+                    });
                     x += CONST.BLOCK_SIZE * 10;
                 }
                 checkpoint.push({ x: 600, y: CONST.CANVAS_HEIGHT - 150 });
             }
-
-            generateWorld4(blocks, hazards, items, checkpoint, difficulty) {
-                let x = 200;
-                for (let i = 0; i < 3 + this.level; i++) {
-                    blocks.push({ x, y: CONST.CANVAS_HEIGHT - 200, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
-                    blocks.push({ x: x + CONST.BLOCK_SIZE * 7, y: CONST.CANVAS_HEIGHT - 400, width: CONST.BLOCK_SIZE, height: CONST.BLOCK_SIZE, type: 'solid' });
-                    x += CONST.BLOCK_SIZE * 12;
-                }
-            }
-
-            generateWorld5(blocks, hazards, items, checkpoint, difficulty) {
-                let x = 200;
-                for (let i = 0; i < 3 + this.level; i++) {
-                    blocks.push({ x, y: CONST.CANVAS_HEIGHT - 200, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
-                    blocks.push({ x: x + CONST.BLOCK_SIZE * 6, y: CONST.CANVAS_HEIGHT - 300, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
-                    x += CONST.BLOCK_SIZE * 10;
-                }
-            }
-
-            generateWorld6(blocks, hazards, items, checkpoint, difficulty) {
-                let x = 200;
-                for (let i = 0; i < 2 + this.level; i++) {
-                    blocks.push({ x, y: CONST.CANVAS_HEIGHT - 200, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
-                    blocks.push({ x: x + CONST.BLOCK_SIZE * 3, y: 100, width: CONST.BLOCK_SIZE * 2, height: CONST.BLOCK_SIZE, type: 'solid' });
-                    x += CONST.BLOCK_SIZE * 12;
-                }
-            }
         }
 
-        // Player class
+        // ==================== ENHANCED PLAYER CLASS ====================
         class Player {
             constructor(x, y) {
                 this.x = x;
@@ -863,13 +746,15 @@
                 this.lastShiftPress = 0;
                 this.shiftPressCount = 0;
                 this.currentSkin = 0;
-                this.color = 'blue';
                 this.isDucking = false;
                 this.isSprinting = false;
                 this.checkpointX = x;
                 this.checkpointY = y;
                 this.deaths = 0;
                 this.levelStartTime = Date.now();
+                this.isInvincible = false;
+                this.invincibilityTime = 0;
+                this.animationFrame = 0;
             }
 
             update(keys, blocks, hazards, items) {
@@ -889,11 +774,14 @@
                     this.lastShiftPress = now;
                     this.shiftPressCount++;
 
-                    if (gameState.dashType === 'double-tap' && this.shiftPressCount === 2) {
+                    if (this.shiftPressCount === 2) {
                         if (this.canDash && this.dashCooldown <= 0) {
                             this.velocityX *= 3;
                             this.canDash = false;
                             this.dashCooldown = 30;
+                            this.isInvincible = true;
+                            this.invincibilityTime = 20;
+                            createParticles(this.x + this.width / 2, this.y + this.height / 2, 8, '#FF69B4');
                         }
                     }
                 } else {
@@ -903,11 +791,11 @@
                 if ((keys[' '] || keys['w'] || keys['arrowup']) && (this.isOnGround || this.canDoubleJump)) {
                     if (this.isOnGround) {
                         this.velocityY = -12;
-                        this.isJumping = true;
                         this.canDoubleJump = true;
                     } else if (this.canDoubleJump) {
                         this.velocityY = -12;
                         this.canDoubleJump = false;
+                        createParticles(this.x + this.width / 2, this.y + this.height / 2, 6, '#FFD700');
                     }
                     this.isOnGround = false;
                 }
@@ -923,10 +811,12 @@
                     this.checkCollision(block);
                 }
 
-                for (let hazard of hazards) {
-                    if (this.checkHazardCollision(hazard)) {
-                        this.respawn();
-                        this.deaths++;
+                if (!this.isInvincible) {
+                    for (let hazard of hazards) {
+                        if (this.checkHazardCollision(hazard)) {
+                            this.respawn();
+                            this.deaths++;
+                        }
                     }
                 }
 
@@ -934,6 +824,7 @@
                     if (Math.abs(this.x - item.x) < 30 && Math.abs(this.y - item.y) < 30) {
                         if (item.type === 'coin') {
                             playerProgress.coins += 10;
+                            createParticles(item.x, item.y, 10, '#FFD700');
                         }
                         return false;
                     }
@@ -945,7 +836,12 @@
                 if (this.y > CONST.CANVAS_HEIGHT) this.respawn();
 
                 this.dashCooldown--;
+                if (this.isInvincible) {
+                    this.invincibilityTime--;
+                    if (this.invincibilityTime <= 0) this.isInvincible = false;
+                }
 
+                this.animationFrame = (this.animationFrame + 1) % 8;
                 return items;
             }
 
@@ -984,20 +880,229 @@
                 this.x = this.checkpointX;
                 this.y = this.checkpointY;
                 this.velocityY = 0;
+                createParticles(this.x, this.y, 12, '#FF4444');
             }
 
             draw(ctx) {
                 const skin = playerProgress.skins.has(this.currentSkin) ? this.currentSkin : 0;
                 const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181', '#AA96DA', '#FCBAD3', '#A8D8EA', '#FFD3B6', '#FFAAA5', '#FF8B94', '#A8E6CF', '#FFD3B6', '#FFAAA5', '#FF8B94', '#C7CEEA', '#FFDDC1', '#B5EAD7', '#FFB4B4', '#FFFFBA'];
+                
+                ctx.save();
+                if (this.isInvincible) {
+                    ctx.globalAlpha = 0.7 + Math.sin(this.animationFrame * 0.5) * 0.3;
+                    ctx.shadowColor = '#FF69B4';
+                    ctx.shadowBlur = 10;
+                }
+
                 ctx.fillStyle = colors[skin % colors.length];
                 ctx.fillRect(this.x, this.y, this.width, this.height);
                 ctx.strokeStyle = '#000';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(this.x, this.y, this.width, this.height);
+
+                // Eyes
+                ctx.fillStyle = '#000';
+                ctx.fillRect(this.x + 6, this.y + 8, 4, 4);
+                ctx.fillRect(this.x + 14, this.y + 8, 4, 4);
+
+                ctx.restore();
             }
         }
 
-        // Game Engine
+        // ==================== ENHANCED BACKGROUND RENDERER ====================
+        class BackgroundRenderer {
+            constructor(world) {
+                this.world = world;
+                this.parallaxOffset = 0;
+            }
+
+            drawCrystalCaveBackground(ctx) {
+                // Sky
+                const gradient = ctx.createLinearGradient(0, 0, 0, CONST.CANVAS_HEIGHT);
+                gradient.addColorStop(0, '#1a0033');
+                gradient.addColorStop(0.5, '#4d0099');
+                gradient.addColorStop(1, '#6600cc');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, CONST.CANVAS_WIDTH, CONST.CANVAS_HEIGHT);
+
+                // Glowing crystals in background
+                ctx.save();
+                ctx.globalAlpha = 0.4;
+                for (let i = 0; i < 5; i++) {
+                    const x = (i * 300 + this.parallaxOffset * 0.3) % CONST.CANVAS_WIDTH;
+                    ctx.fillStyle = `hsl(${280 + i * 20}, 100%, 60%)`;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 100);
+                    ctx.lineTo(x + 40, 150);
+                    ctx.lineTo(x - 40, 150);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    ctx.fillStyle = `hsl(${280 + i * 20}, 100%, 80%)`;
+                    ctx.globalAlpha = 0.6;
+                    ctx.beginPath();
+                    ctx.arc(x, 125, 20, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            drawIceCaveBackground(ctx) {
+                // Sky
+                const gradient = ctx.createLinearGradient(0, 0, 0, CONST.CANVAS_HEIGHT);
+                gradient.addColorStop(0, '#e0f7ff');
+                gradient.addColorStop(0.5, '#b3e5ff');
+                gradient.addColorStop(1, '#80deea');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, CONST.CANVAS_WIDTH, CONST.CANVAS_HEIGHT);
+
+                // Falling snow particles
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                for (let i = 0; i < 20; i++) {
+                    const x = (i * 100 + this.parallaxOffset) % CONST.CANVAS_WIDTH;
+                    const y = (i * 50 + Date.now() * 0.05) % CONST.CANVAS_HEIGHT;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Icicles
+                ctx.fillStyle = 'rgba(200, 230, 255, 0.7)';
+                for (let i = 0; i < 8; i++) {
+                    const x = i * 160;
+                    ctx.beginPath();
+                    ctx.moveTo(x + 40, 0);
+                    ctx.lineTo(x + 50, 100);
+                    ctx.lineTo(x + 30, 100);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+
+            drawLavaCaveBackground(ctx) {
+                // Sky
+                const gradient = ctx.createLinearGradient(0, 0, 0, CONST.CANVAS_HEIGHT);
+                gradient.addColorStop(0, '#ff4500');
+                gradient.addColorStop(0.5, '#ff6347');
+                gradient.addColorStop(1, '#ff7f50');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, CONST.CANVAS_WIDTH, CONST.CANVAS_HEIGHT);
+
+                // Lava bubbles
+                ctx.fillStyle = 'rgba(255, 200, 0, 0.3)';
+                for (let i = 0; i < 15; i++) {
+                    const x = (i * 100 + this.parallaxOffset * 0.2) % CONST.CANVAS_WIDTH;
+                    const y = 400 + Math.sin(Date.now() * 0.002 + i) * 50;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 30 + Math.sin(Date.now() * 0.001 + i) * 10, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Glowing rocks
+                ctx.fillStyle = 'rgba(255, 100, 0, 0.4)';
+                for (let i = 0; i < 6; i++) {
+                    ctx.fillRect(i * 200, CONST.CANVAS_HEIGHT - 150, 150, 120);
+                }
+            }
+
+            draw(ctx) {
+                if (gameState.currentWorld === 1) {
+                    this.drawCrystalCaveBackground(ctx);
+                } else if (gameState.currentWorld === 2) {
+                    this.drawIceCaveBackground(ctx);
+                } else if (gameState.currentWorld === 3) {
+                    this.drawLavaCaveBackground(ctx);
+                }
+            }
+        }
+
+        // ==================== ENHANCED BLOCK RENDERER ====================
+        function drawBlock(ctx, block) {
+            if (block.type === 'crystal') {
+                // Crystal block with gradient and glow
+                const gradient = ctx.createLinearGradient(block.x, block.y, block.x + block.width, block.y + block.height);
+                gradient.addColorStop(0, '#00ff99');
+                gradient.addColorStop(0.5, '#00ccff');
+                gradient.addColorStop(1, '#9900ff');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(block.x, block.y, block.width, block.height);
+
+                // Crystal sparkle effect
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.fillRect(block.x + 5, block.y + 5, 8, 8);
+                ctx.fillRect(block.x + block.width - 13, block.y + block.height - 13, 8, 8);
+
+                // Outline
+                ctx.strokeStyle = '#ffff00';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(block.x, block.y, block.width, block.height);
+
+                // Glow
+                ctx.shadowColor = '#00ffff';
+                ctx.shadowBlur = 10;
+                ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(block.x - 2, block.y - 2, block.width + 4, block.height + 4);
+            } else if (block.type === 'ice') {
+                // Ice block with transparency and reflection
+                const gradient = ctx.createLinearGradient(block.x, block.y, block.x + block.width, block.y + block.height);
+                gradient.addColorStop(0, 'rgba(200, 230, 255, 0.8)');
+                gradient.addColorStop(0.5, 'rgba(150, 200, 255, 0.9)');
+                gradient.addColorStop(1, 'rgba(100, 180, 255, 0.8)');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(block.x, block.y, block.width, block.height);
+
+                // Reflection lines
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(block.x + 5, block.y + 10);
+                ctx.lineTo(block.x + block.width - 5, block.y + 10);
+                ctx.stroke();
+
+                // Outline
+                ctx.strokeStyle = 'rgba(100, 150, 255, 1)';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(block.x, block.y, block.width, block.height);
+            } else if (block.type === 'lava') {
+                // Lava block with animated gradient
+                const time = Date.now() * 0.003;
+                const gradient = ctx.createLinearGradient(block.x, block.y + Math.sin(time) * 5, block.x + block.width, block.y + block.height);
+                gradient.addColorStop(0, '#ff4500');
+                gradient.addColorStop(0.5, '#ff6347');
+                gradient.addColorStop(1, '#ff7f50');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(block.x, block.y, block.width, block.height);
+
+                // Lava detail
+                ctx.fillStyle = 'rgba(255, 200, 0, 0.4)';
+                for (let i = 0; i < 3; i++) {
+                    ctx.beginPath();
+                    ctx.arc(
+                        block.x + (block.width / 3) * (i + 1) + Math.sin(time + i) * 10,
+                        block.y + block.height / 2 + Math.cos(time + i) * 5,
+                        5 + Math.sin(time + i) * 3,
+                        0,
+                        Math.PI * 2
+                    );
+                    ctx.fill();
+                }
+
+                // Outline
+                ctx.strokeStyle = '#ffaa00';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(block.x, block.y, block.width, block.height);
+            } else {
+                // Standard solid block
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(block.x, block.y, block.width, block.height);
+                ctx.strokeStyle = '#654321';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(block.x, block.y, block.width, block.height);
+            }
+        }
+
+        // ==================== GAME ENGINE ====================
         class Game {
             constructor() {
                 this.canvas = document.getElementById('gameCanvas');
@@ -1012,6 +1117,7 @@
                 this.checkpoint = [];
                 this.levelStart = null;
                 this.levelEnd = null;
+                this.backgroundRenderer = null;
 
                 this.keys = {};
                 this.setupInputs();
@@ -1059,10 +1165,11 @@
             renderWorldSelect() {
                 const grid = document.getElementById('worldSelectGrid');
                 grid.innerHTML = '';
+                const worldNames = ['🔮 CRYSTAL CAVES', '❄️ ICE CAVERN', '🌋 LAVA REALM'];
                 for (let w = 1; w <= CONST.WORLDS; w++) {
                     const btn = document.createElement('div');
                     btn.className = 'world-card';
-                    btn.innerHTML = `<h3>🌍 WORLD ${w}</h3><p>${['Basics', 'Traps', 'Puzzles', 'Grapple', 'Portals', 'Shadow'][w-1]}</p>`;
+                    btn.innerHTML = `<h3>${worldNames[w-1]}</h3>`;
                     btn.onclick = () => this.selectWorld(w);
                     grid.appendChild(btn);
                 }
@@ -1075,7 +1182,8 @@
             }
 
             renderLevelSelect(world) {
-                document.getElementById('worldTitle').textContent = `WORLD ${world} - LEVELS`;
+                const worldNames = ['🔮 CRYSTAL CAVES', '❄️ ICE CAVERN', '🌋 LAVA REALM'];
+                document.getElementById('worldTitle').textContent = `${worldNames[world-1]} - LEVELS`;
                 const grid = document.getElementById('levelGrid');
                 grid.innerHTML = '';
                 for (let l = 1; l <= CONST.LEVELS_PER_WORLD; l++) {
@@ -1083,8 +1191,7 @@
                     const btn = document.createElement('button');
                     btn.className = 'level-button';
                     btn.textContent = l;
-                    const completed = playerProgress.completedLevels.has(levelId);
-                    if (completed) btn.classList.add('completed');
+                    if (playerProgress.completedLevels.has(levelId)) btn.classList.add('completed');
                     btn.onclick = () => this.startLevel(world, l);
                     grid.appendChild(btn);
                 }
@@ -1107,6 +1214,7 @@
                 this.checkpoint = levelData.checkpoint;
                 this.levelStart = levelData.start;
                 this.levelEnd = levelData.end;
+                this.backgroundRenderer = new BackgroundRenderer(world);
 
                 this.player = new Player(this.levelStart.x, this.levelStart.y);
                 if (this.checkpoint.length > 0) {
@@ -1123,9 +1231,7 @@
             animate() {
                 requestAnimationFrame(() => this.animate());
 
-                if (!gameState.isPlaying || gameState.isPaused) {
-                    return;
-                }
+                if (!gameState.isPlaying || gameState.isPaused) return;
 
                 if (this.player) {
                     this.items = this.player.update(this.keys, this.blocks, this.hazards, this.items);
@@ -1134,6 +1240,7 @@
                         if (Math.abs(this.player.x - cp.x) < 40 && Math.abs(this.player.y - cp.y) < 40) {
                             this.player.checkpointX = cp.x;
                             this.player.checkpointY = cp.y;
+                            createParticles(cp.x, cp.y, 8, '#00ff00');
                         }
                     }
 
@@ -1147,64 +1254,112 @@
             }
 
             render() {
-                this.ctx.fillStyle = 'linear-gradient(to bottom, #87ceeb, #e0f6ff)';
-                this.ctx.fillRect(0, 0, CONST.CANVAS_WIDTH, CONST.CANVAS_HEIGHT);
-
-                for (let block of this.blocks) {
-                    this.ctx.fillStyle = '#8B4513';
-                    this.ctx.fillRect(block.x, block.y, block.width, block.height);
-                    this.ctx.strokeStyle = '#654321';
-                    this.ctx.lineWidth = 2;
-                    this.ctx.strokeRect(block.x, block.y, block.width, block.height);
+                // Background
+                if (this.backgroundRenderer) {
+                    this.backgroundRenderer.draw(this.ctx);
                 }
 
+                // Blocks
+                for (let block of this.blocks) {
+                    drawBlock(this.ctx, block);
+                }
+
+                // Hazards
                 for (let hazard of this.hazards) {
                     if (hazard.type === 'saw') {
+                        this.ctx.save();
+                        this.ctx.translate(hazard.x, hazard.y);
+                        this.ctx.rotate((Date.now() * 0.01) % (Math.PI * 2));
                         this.ctx.fillStyle = '#FF0000';
                         this.ctx.beginPath();
-                        this.ctx.arc(hazard.x, hazard.y, hazard.radius, 0, Math.PI * 2);
+                        this.ctx.arc(0, 0, hazard.radius, 0, Math.PI * 2);
                         this.ctx.fill();
+                        for (let i = 0; i < 8; i++) {
+                            const angle = (Math.PI * 2 * i) / 8;
+                            this.ctx.fillStyle = '#FF6B6B';
+                            this.ctx.fillRect(Math.cos(angle) * 15 - 2, Math.sin(angle) * 15 - 5, 4, 10);
+                        }
+                        this.ctx.restore();
                     } else if (hazard.type === 'spike') {
                         this.ctx.fillStyle = '#FF6B6B';
                         this.ctx.fillRect(hazard.x, hazard.y, hazard.width, hazard.height);
+                        this.ctx.fillStyle = '#FF4444';
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(hazard.x + hazard.width / 2, hazard.y);
+                        this.ctx.lineTo(hazard.x + hazard.width, hazard.y + hazard.height);
+                        this.ctx.lineTo(hazard.x, hazard.y + hazard.height);
+                        this.ctx.closePath();
+                        this.ctx.fill();
                     }
                 }
 
+                // Items
                 for (let item of this.items) {
                     if (item.type === 'coin') {
+                        this.ctx.save();
+                        this.ctx.translate(item.x, item.y);
+                        this.ctx.rotate((Date.now() * 0.01) % (Math.PI * 2));
                         this.ctx.fillStyle = '#FFD700';
                         this.ctx.beginPath();
-                        this.ctx.arc(item.x, item.y, 8, 0, Math.PI * 2);
+                        this.ctx.arc(0, 0, 8, 0, Math.PI * 2);
                         this.ctx.fill();
                         this.ctx.strokeStyle = '#FFA500';
                         this.ctx.lineWidth = 2;
                         this.ctx.stroke();
+                        if (item.sparkle) {
+                            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                            this.ctx.fillRect(-3, -3, 2, 2);
+                            this.ctx.fillRect(2, 1, 2, 2);
+                        }
+                        this.ctx.restore();
                     }
                 }
 
+                // Checkpoints
                 for (let cp of this.checkpoint) {
+                    this.ctx.save();
+                    this.ctx.translate(cp.x, cp.y);
+                    this.ctx.rotate((Date.now() * 0.005) % (Math.PI * 2));
+                    this.ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
+                    this.ctx.fillRect(-20, -20, 40, 40);
                     this.ctx.fillStyle = '#00FF00';
-                    this.ctx.fillRect(cp.x - 15, cp.y - 15, 30, 30);
                     this.ctx.font = 'bold 20px Arial';
-                    this.ctx.fillStyle = '#000';
-                    this.ctx.fillText('🚩', cp.x - 8, cp.y + 6);
+                    this.ctx.textAlign = 'center';
+                    this.ctx.textBaseline = 'middle';
+                    this.ctx.fillText('🚩', 0, 0);
+                    this.ctx.restore();
                 }
 
+                // End portal
+                this.ctx.save();
+                this.ctx.translate(this.levelEnd.x, this.levelEnd.y);
+                this.ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, 30 + Math.sin(Date.now() * 0.005) * 5, 0, Math.PI * 2);
+                this.ctx.fill();
                 this.ctx.fillStyle = '#FFD700';
-                this.ctx.fillRect(this.levelEnd.x - 20, this.levelEnd.y - 20, 40, 40);
-                this.ctx.fillStyle = '#000';
-                this.ctx.font = 'bold 20px Arial';
-                this.ctx.fillText('🏁', this.levelEnd.x - 10, this.levelEnd.y + 6);
+                this.ctx.font = 'bold 24px Arial';
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                this.ctx.fillText('🏁', 0, 0);
+                this.ctx.restore();
 
+                // Player
                 if (this.player) {
                     this.player.draw(this.ctx);
                 }
 
+                // Particles
+                for (let particle of particles) {
+                    particle.update();
+                    particle.draw(this.ctx);
+                }
+                particles = particles.filter(p => p.life > 0);
+
                 if (gameState.debug) {
-                    this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
                     this.ctx.font = '12px Arial';
                     this.ctx.fillText(`X: ${this.player.x.toFixed(0)} Y: ${this.player.y.toFixed(0)}`, 10, 30);
-                    this.ctx.fillText(`VX: ${this.player.velocityX.toFixed(2)} VY: ${this.player.velocityY.toFixed(2)}`, 10, 50);
                 }
             }
 
@@ -1218,7 +1373,7 @@
                 document.getElementById('hudTimer').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
 
                 document.getElementById('playerDisplay').textContent = `👤 ${playerProgress.username}`;
-                document.getElementById('statsDisplay').innerHTML = `💰 ${playerProgress.coins} | 🏆 ${playerProgress.achievements.size}/200 | ⏳ ${Math.floor(playerProgress.playtime / 3600)}h`;
+                document.getElementById('statsDisplay').innerHTML = `💰 ${playerProgress.coins} | 🏆 ${playerProgress.achievements.size}/200`;
                 document.getElementById('shopCoins').textContent = playerProgress.coins;
             }
 
@@ -1233,11 +1388,10 @@
                 document.getElementById('finalTime').textContent = `${Math.floor(elapsed / 60)}:${(elapsed % 60).toString().padStart(2, '0')}`;
                 document.getElementById('finalDeaths').textContent = this.player.deaths;
                 document.getElementById('finalCoins').textContent = playerProgress.coins;
-                document.getElementById('totalCoins').textContent = this.items.length + 10;
-                document.getElementById('newAchievements').textContent = '1';
 
                 document.getElementById('levelComplete').classList.remove('hidden');
                 document.getElementById('hud').classList.add('hidden');
+                createParticles(this.levelEnd.x, this.levelEnd.y, 30, '#FFD700');
             }
 
             nextLevel() {
@@ -1287,12 +1441,15 @@
                 grid.innerHTML = '';
                 for (let skin of shopSystem.skins) {
                     const item = document.createElement('div');
-                    item.className = 'shop-item';
+                    item.className = 'level-button';
                     if (playerProgress.skins.has(skin.id)) {
-                        item.classList.add('owned');
-                        item.innerHTML = `<div class="shop-item-preview" style="background: ${skin.color}"></div><p>✓ Owned</p>`;
+                        item.style.background = skin.color;
+                        item.style.opacity = '1';
+                        item.textContent = '✓ OWNED';
                     } else {
-                        item.innerHTML = `<div class="shop-item-preview" style="background: ${skin.color}"></div><p class="shop-item-price">💰 ${skin.price}</p>`;
+                        item.style.background = skin.color;
+                        item.style.opacity = '0.6';
+                        item.textContent = `💰${skin.price}`;
                         item.onclick = () => {
                             const msg = shopSystem.buySkin(skin.id);
                             if (msg.includes('purchased')) {
@@ -1314,23 +1471,20 @@
 
                 if (playerProgress.isLoggedIn) {
                     content.innerHTML = `
-                        <div class="account-info">
-                            <div>👤 Logged in as: <strong>${playerProgress.username}</strong></div>
-                            <div>💰 Coins: <strong>${playerProgress.coins}</strong></div>
-                            <div>🏆 Achievements: <strong>${playerProgress.achievements.size}/200</strong></div>
-                            <div>💀 Total Deaths: <strong>${playerProgress.deaths}</strong></div>
+                        <div class="level-stats">
+                            <p>👤 ${playerProgress.username}</p>
+                            <p>💰 ${playerProgress.coins}</p>
+                            <p>🏆 ${playerProgress.achievements.size}/200</p>
                         </div>
-                        <button class="menu-button" onclick="game.logout()">🚪 LOGOUT</button>
+                        <button class="menu-button" onclick="game.logout()">LOGOUT</button>
                     `;
                 } else {
                     content.innerHTML = `
-                        <div class="auth-form">
-                            <input type="text" id="authUsername" placeholder="Username" />
-                            <input type="password" id="authPassword" placeholder="Password" />
-                            <button class="menu-button" onclick="game.loginAccount()">LOGIN</button>
-                            <button class="menu-button" onclick="game.registerAccount()">REGISTER</button>
-                        </div>
-                        <button class="menu-button" onclick="game.continueAsGuest()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">CONTINUE AS GUEST</button>
+                        <input type="text" id="authUsername" placeholder="Username" style="padding: 10px; width: 100%; margin: 10px 0; border-radius: 5px; border: none;">
+                        <input type="password" id="authPassword" placeholder="Password" style="padding: 10px; width: 100%; margin: 10px 0; border-radius: 5px; border: none;">
+                        <button class="menu-button" onclick="game.loginAccount()">LOGIN</button>
+                        <button class="menu-button" onclick="game.registerAccount()">REGISTER</button>
+                        <button class="menu-button" onclick="game.goToMenu()">GUEST MODE</button>
                     `;
                 }
             }
@@ -1365,10 +1519,6 @@
                 this.showAccount();
             }
 
-            continueAsGuest() {
-                this.goToMenu();
-            }
-
             showTutorial() {
                 document.getElementById('mainMenu').classList.add('hidden');
                 document.getElementById('tutorialMenu').classList.remove('hidden');
@@ -1386,10 +1536,6 @@
                 };
                 document.getElementById('volumeSlider').onchange = (e) => {
                     gameState.volume = e.target.value;
-                    document.getElementById('volumePercent').textContent = e.target.value + '%';
-                };
-                document.getElementById('dashType').onchange = (e) => {
-                    gameState.dashType = e.target.value;
                 };
             }
 
@@ -1406,17 +1552,16 @@
                     const unlocked = playerProgress.achievements.has(ach.id);
                     if (unlocked) {
                         item.classList.add('unlocked');
-                        item.innerHTML = `<h3>🏆</h3><p>${ach.title}</p><p style="font-size: 12px; color: #FFD700;">+${ach.reward}</p>`;
+                        item.innerHTML = `<h3>🏆</h3><p>${ach.title}</p><p style="font-size: 12px;">+${ach.reward}</p>`;
                     } else {
                         item.classList.add('locked');
-                        item.innerHTML = `<h3>🔒</h3><p>${ach.title}</p><p style="font-size: 12px;">????</p>`;
+                        item.innerHTML = `<h3>🔒</h3><p>???</p><p style="font-size: 12px;">?</p>`;
                     }
                     list.appendChild(item);
                 }
 
                 document.getElementById('achievementStats').innerHTML = `
-                    <p>🏆 <strong>${playerProgress.achievements.size} / ${achievements.list.length}</strong></p>
-                    <p>💰 Earned: <strong>${Array.from(playerProgress.achievements).reduce((sum, id) => sum + (achievements.list[id]?.reward || 0), 0)}</strong></p>
+                    <p>🏆 ${playerProgress.achievements.size} / ${achievements.list.length}</p>
                 `;
             }
 
@@ -1426,7 +1571,7 @@
             }
         }
 
-        // Initialize
+        // Initialize game
         const game = new Game();
     </script>
 </body>

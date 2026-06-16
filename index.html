@@ -282,6 +282,13 @@
             align-items: center;
             justify-content: center;
             z-index: 2000;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
         .loading-text {
@@ -289,6 +296,12 @@
             font-size: 24px;
             margin-bottom: 20px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         .loading-bar {
@@ -304,7 +317,7 @@
             height: 100%;
             background: linear-gradient(90deg, #ff6b35, #ffd700);
             width: 0%;
-            transition: width 0.3s;
+            transition: width 0.3s ease;
         }
     </style>
 </head>
@@ -420,7 +433,7 @@
                 this.setupLights();
                 this.setupEventListeners();
                 this.setupAchievements();
-                this.hideLoadingScreen();
+                this.simulateLoadingScreen();
 
                 window.addEventListener('resize', () => this.onWindowResize());
                 this.animate();
@@ -472,6 +485,30 @@
                     { id: 8, name: 'Survivor', desc: 'Complete story', unlocked: false },
                     { id: 9, name: 'Master', desc: 'Complete all tasks', unlocked: false },
                 ];
+            }
+
+            simulateLoadingScreen() {
+                const progressBar = document.getElementById('loadingProgress');
+                let progress = 0;
+
+                // Animate progress bar
+                const interval = setInterval(() => {
+                    const increment = Math.random() * 15 + 5;
+                    progress = Math.min(progress + increment, 90);
+                    progressBar.style.width = progress + '%';
+
+                    if (progress >= 90) {
+                        clearInterval(interval);
+                    }
+                }, 200);
+
+                // Complete the bar and hide screen
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').classList.add('hidden');
+                    }, 500);
+                }, 2000);
             }
 
             onKeyDown(e) {
@@ -779,16 +816,6 @@
                 this.camera.aspect = window.innerWidth / window.innerHeight;
                 this.camera.updateProjectionMatrix();
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
-            }
-
-            hideLoadingScreen() {
-                setTimeout(() => {
-                    document.getElementById('loadingScreen').style.opacity = '0';
-                    document.getElementById('loadingScreen').style.pointerEvents = 'none';
-                    setTimeout(() => {
-                        document.getElementById('loadingScreen').style.display = 'none';
-                    }, 500);
-                }, 800);
             }
 
             animate() {
